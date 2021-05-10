@@ -1,0 +1,61 @@
+@startuml DB DIAGRAM
+
+hide circle
+skinparam linetype ortho
+
+entity users {
+  * id : UUID <<PK>>
+  * email : TEXT <<not null>>
+  * name : TEXT <<not null>>
+  * password : TEXT <<not null>>
+  * role : TEXT <<not null>>
+}
+
+entity municipalities {
+  * id : INTEGER <<PK>> <<generated>>
+  * name : TEXT <<unique>> <<not null>>
+}
+
+entity cabins {
+  * id : INTEGER <<PK>> <<generated>>
+  * address : TEXT <<not null>>
+  * price : MONEY <<not null>>
+  * description : TEXT
+  ---
+  * municipality_id : INTEGER <<FK>> <<not null>>
+}
+
+entity reviews {
+  * id : INTEGER <<PK>> <<generated>>
+  * content : TEXT
+  * rating : SMALLINT
+  ---
+  * user_id : UUID <<FK>> not null
+  * cabin_id : INTEGER <<FK>> not null
+}
+
+entity reservations {
+  * id : INTEGER <<PK>> <<generated>>
+  * reserve_start : DATE <<not null>>
+  * reserve_end : DATE <<not null>>
+  ---
+  * user_id : UUID <<FK>> <<not null>>
+  * cabin_id : INTEGER <<FK>> <<not null>>
+}
+
+entity cabin_images {
+  * id : INTEGER <<PK>> <<generated>>
+  * filename : TEXT <<not null>>
+  * bytes : BYTEA <<not null>>
+  ---
+  * cabin_id : INTEGER <<FK>> <<not null>>
+}
+
+cabins ||--o{ reservations
+users ||--o{ reservations
+cabin_images }o--|| cabins
+reviews }o--|| cabins
+reviews }o--|| users
+municipalities ||--o{ cabins
+
+@enduml
