@@ -15,14 +15,14 @@ A cabin owner can add/remove their cabin(s) from the website.
 
 #### Customer
 A customer can browse the cabins and reserve it for given days. The customer can
-also leave reviews about the cabins.
+also leave reviews for the cabins.
 
 #### Admin
 An admin can delete users, cabins, and reviews if necessary.
 
 ### Cabins
 #### Cabin adding
-When adding a cabin to the website, the cabin owner can supply the following 
+When adding a cabin to the website, the cabin owner can supply the following
 information about it:
 * name
 * location
@@ -43,3 +43,13 @@ left from this page as well.
 
 From the info page, the customer can select dates and reserve the cabin if it's
 available.
+
+### Database
+The application will at least include the following database tables
+|Table name|Table description|
+|--------|------------|
+|Users|A table that holds the users of the application|
+|Cabins|All the cabins|
+|Municipality|Municipalities of Finland|
+|Reviews|The reviews of each cabin|
+|Reservations|Reservation information for the cabins|
