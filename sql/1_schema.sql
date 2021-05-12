@@ -14,11 +14,13 @@ CREATE TABLE municipalities (
 CREATE TABLE cabins (
     id              SERIAL  PRIMARY KEY,
     address         TEXT    NOT NULL UNIQUE,
-    municipality_id INTEGER NOT NULL,
     price           MONEY   NOT NULL,
     description     TEXT,
+    municipality_id INTEGER NOT NULL,
+    owner_id        UUID    NOT NULL,
 
-    FOREIGN KEY(municipality_id) REFERENCES municipalities(id)
+    FOREIGN KEY(municipality_id) REFERENCES municipalities(id),
+    FOREIGN KEY(owner_id)        REFERENCES users(id)
 );
 
 CREATE TABLE reviews (
@@ -37,7 +39,7 @@ CREATE TABLE reservations (
     reserve_start   DATE        NOT NULL,
     reserve_end     DATE        NOT NULL,
     user_id         UUID        NOT NULL,
-    cabin_id        INTEGER     NOT NULL UNIQUE,
+    cabin_id        INTEGER     NOT NULL,
 
     FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(cabin_id) REFERENCES cabins(id)
