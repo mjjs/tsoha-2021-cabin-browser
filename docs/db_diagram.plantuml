@@ -23,6 +23,7 @@ entity cabins {
   * description : TEXT
   ---
   * municipality_id : INTEGER <<FK>> <<not null>>
+  * owner_id : UUID <<FK>> <<not null>>
 }
 
 entity reviews {
