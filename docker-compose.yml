@@ -1,0 +1,18 @@
+# Dev environment for the application
+version: '3'
+services:
+  db:
+    image: postgres:13.2
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    environment:
+      - POSTGRES_USER=cabin-browser
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
