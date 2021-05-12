@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Register</h2>
+
+<form action="/register" method="post">
+    Name:
+    <br>
+    <input type="text" name="name" minlength="1" maxlength="20">
+    <br/>
+    Email:
+    <br>
+    <input type="text" name="email" minlength="1" maxlength="20">
+    <br/>
+    Password: <br>
+    <input type="password" name="password">
+    <br/>
+    Confirm password: <br><input type="password" name="confirm_password">
+    <br/>
+    User role:
+    <select name="role">
+        <option value=1> Customer</option>
+        <option value=2> Cabin owner</option>
+    </select>
+    <br/>
+    <input type="submit" value="Register">
+</form>
+
+<br/>
+<a href="/login">Return to login page</a>
+
+{% endblock %}
