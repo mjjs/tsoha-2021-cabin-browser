@@ -18,8 +18,9 @@ entity municipalities {
 
 entity cabins {
   * id : INTEGER <<PK>> <<generated>>
+  * name : TEXT <<not null>>
   * address : TEXT <<not null>>
-  * price : MONEY <<not null>>
+  * price : INTEGER <<not null>> <<microcurrency>>
   * description : TEXT
   ---
   * municipality_id : INTEGER <<FK>> <<not null>>
@@ -37,8 +38,8 @@ entity reviews {
 
 entity reservations {
   * id : INTEGER <<PK>> <<generated>>
-  * reserve_start : DATE <<not null>>
-  * reserve_end : DATE <<not null>>
+  * start_date : DATE <<not null>>
+  * end_date : DATE <<not null>>
   ---
   * user_id : UUID <<FK>> <<not null>>
   * cabin_id : INTEGER <<FK>> <<not null>>
@@ -47,7 +48,7 @@ entity reservations {
 entity cabin_images {
   * id : INTEGER <<PK>> <<generated>>
   * filename : TEXT <<not null>>
-  * bytes : BYTEA <<not null>>
+  * is_default : BOOLEAN <<not null>>
   ---
   * cabin_id : INTEGER <<FK>> <<not null>>
 }
