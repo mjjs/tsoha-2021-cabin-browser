@@ -8,6 +8,7 @@ def ensure_env_var(env_var: str) -> str:
     var = getenv(env_var)
     if var:
         return var
+
     raise EnvironmentalVariableNotFoundError(env_var)
 
 

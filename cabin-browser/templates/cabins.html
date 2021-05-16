@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+
+<script>
+    const deleteCabin = (cabinId, nReservations) => {
+        if (nReservations > 0) {
+            if (!confirm("The cabin has reservations and they will be deleted. Are you sure?")) {
+                return;
+            }
+        }
+
+        fetch(
+            `/cabin/${cabinId}`,
+            { method: "DELETE" },
+        ).then(() => {
+            window.location = `/cabins${window.location.search}`;
+        });
+    };
+</script>
+
+<h2>Cabins</h2>
+<ul id="cabin_list">
+    {% for cabin in cabins %}
+        <li>
+            <div class="cabin-card">
+                <h3>
+                    {{ cabin.name }}
+                    <br/>
+                    {{ cabin.address }}, {{ cabin.municipality }}
+                </h3>
+                <img src="/static/{{ cabin.images[0] }}" width=200px height=200px>
+                {% if cabin.description %}
+                    <p>{{ cabin.description }}</p>
+                {% endif %}
+                {% if cabin.avg_rating %}
+                    <p>Rating: {{ cabin.avg_rating }} / 5</p>
+                {% else %}
+                    <p>No ratings given</p>
+                {% endif %}
+                <p>Price: {{ cabin.price }}€ / day</p>
+                <p><a href="/cabin/{{ cabin.id }}">Details</a></p>
+
+                {% if cabin.owner_id == current_user.id %}
+                    <button onclick="deleteCabin({{ cabin.id }}, {{ cabin.reservations|length }});">Delete cabin</button>
+                {% endif %}
+            </div>
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

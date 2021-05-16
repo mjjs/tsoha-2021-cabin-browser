@@ -1,0 +1,14 @@
+#cabin_list {
+    list-style: none;
+}
+
+.cabin-card {
+    /*background-color: hotpink;*/
+    border-style: solid;
+    border-width: 1px;
+    margin-bottom: 2px;
+}
+
+#error-message {
+    color: red;
+}

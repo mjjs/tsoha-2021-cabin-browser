@@ -2,6 +2,10 @@ from psycopg2 import connect, extras
 from flask import g
 from config import DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME
 from user_repository import UserRepository
+from cabin_repository import CabinRepository
+from review_repository import ReviewRepository
+from cabin_image_repository import CabinImageRepository
+from reservation_repository import ReservationRepository
 
 DATABASE_INIT_FILE = "create_tables.sql"
 
@@ -29,18 +33,10 @@ class Database:
     def __init__(self, connection_pool):
         self._connection_pool = connection_pool
         self.user_repository = UserRepository(self._connection_pool)
+        self.cabin_repository = CabinRepository(self._connection_pool)
+        self.review_repository = ReviewRepository(self._connection_pool)
+        self.cabin_image_repository = CabinImageRepository(self._connection_pool)
+        self.reservation_repository = ReservationRepository(self._connection_pool)
 
     def close(self):
         self._connection_pool.close()
-
-    #def initialize(self):
-    #    print("Initializing database")
-    #    create_tables_sql_file = open(DATABASE_INIT_FILE, "r")
-    #    sql = create_tables_sql_file.read()
-    #    create_tables_sql_file.close()
-
-    #    cursor = self._db.cursor()
-    #    cursor.executescript(sql)
-    #    self._db.commit()
-    #    cursor.close()
-    #    print("Database initialized")

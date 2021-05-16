@@ -13,42 +13,51 @@ class UserRepository:
     def __init__(self, connection_pool):
         self._connection_pool = connection_pool
 
-    def add_new_user(self, email, name, password_hash, role):
+    def add(self, email, name, password_hash, role):
         try:
-            self.get_user_by_email(email)
+            self.get_by_email(email)
             raise UserExistsError(email)
         except UserNotFoundError:
             cursor = self._connection_pool.cursor()
+            sql = """
+                INSERT INTO users(id, email, name, password, role)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+
             cursor.execute(
-                    "INSERT INTO users(id, email, name, password, role) VALUES (%s, %s, %s, %s, %s)",
+                    sql,
                     (uuid4(), email, name, password_hash.decode("utf-8"), role),
                     )
+
             self._connection_pool.commit()
             cursor.close()
 
 
-    def get_user_by_email(self, email):
+    def get_by_email(self, email):
         cursor = self._connection_pool.cursor()
-        cursor.execute("SELECT id, email, name, role FROM users WHERE email = %s", (email,))
+        cursor.execute(
+                "SELECT id, email, name, role FROM users WHERE email = %s",
+                (email,)
+        )
         row = cursor.fetchone()
 
         if row is None:
             raise UserNotFoundError("email", email)
 
-        (user_id, email, name, role) = row
+        (id, email, name, role) = row
 
         cursor.close()
 
-        return User(user_id = user_id, email = email, name = name, role = role)
+        return User(id = id, email = email, name = name, role = role)
 
 
-    def get_password_hash_by_user_id(self, user_id):
+    def get_password_hash_by_user_id(self, id):
         cursor = self._connection_pool.cursor()
-        cursor.execute("SELECT password FROM users WHERE id = %s", (user_id,))
+        cursor.execute("SELECT password FROM users WHERE id = %s", (id,))
         row = cursor.fetchone()
 
         if row is None:
-            raise UserNotFoundError("ID", user_id)
+            raise UserNotFoundError("ID", id)
 
         password_hash = row[0]
 
@@ -56,16 +65,19 @@ class UserRepository:
 
         return password_hash
 
-    def get_user_by_id(self, user_id):
+    def get(self, id):
         cursor = self._connection_pool.cursor()
-        cursor.execute("SELECT id, email, name, role FROM users WHERE id = %s", (user_id,))
+        cursor.execute(
+                "SELECT id, email, name, role FROM users WHERE id = %s",
+                (id,)
+        )
         row = cursor.fetchone()
 
         if row is None:
-            raise UserNotFoundError("id", user_id)
+            raise UserNotFoundError("id", id)
 
-        (user_id, email, name, role) = row
+        (id, email, name, role) = row
 
         cursor.close()
 
-        return User(user_id = user_id, email = email, name = name, role = role)
+        return User(id = id, email = email, name = name, role = role)

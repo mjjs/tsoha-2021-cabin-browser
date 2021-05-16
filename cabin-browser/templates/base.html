@@ -1,6 +1,23 @@
 <!DOCTYPE HTML>
-<title>Cabin Browser</title>
-<h1>{{ error_message }}</h1>
-<h1>Cabin Browser</h1>
-<hr>
-{% block content %}{% endblock %}
+<html>
+    <head>
+        <link rel="stylesheet" href="/static/main.css">
+        <title>Cabin Browser</title>
+    </head>
+    <body>
+        <h1>Cabin Browser</h1>
+        {% if current_user.is_authenticated %}
+            <p>Logged in as {{ current_user.name }}
+            <a href="/logout">Log out</a>
+            {% if current_user.role == "OWNER" %}
+                <br>
+                <a href="/cabins?owner={{ current_user.id }}">My cabins</a>
+            {% endif %}
+        {% else %}
+            <a href="/login">Log in</a>
+        {% endif %}
+        <hr>
+        <h1 id="error-message">{{ error_message }}</h1>
+        {% block content %}{% endblock %}
+    </body>
+</html>

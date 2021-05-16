@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Write a review for {{ cabin.name }}</h2>
+<div id="review">
+    <form action="/cabin/{{ cabin.id }}/review" method="post">
+        <label>
+            Rating:
+            <select name="rating">
+                <option value=1>1</option>
+                <option value=2>2</option>
+                <option value=3>3</option>
+                <option value=4>4</option>
+                <option value=5>5</option>
+            </select>
+        </label>
+        <br>
+        <textarea name="content" placeholder="Optional message"></textarea>
+        <input type="submit" value="Send review">
+    </form>
+</div>
+
+{% endblock %}

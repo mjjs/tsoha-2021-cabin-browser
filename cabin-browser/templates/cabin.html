@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+
+<script>
+    const deleteReview = (cabinId, reviewId) => {
+        fetch(
+            `/cabin/${cabinId}/review/${reviewId}`,
+            { method: "DELETE" },
+        ).then(() => {
+            window.location = `/cabin/${cabinId}`;
+        });
+    };
+</script>
+
+<h2>{{ cabin.name }} </h2>
+<div id="cabin">
+    <p>{{ cabin.description }}</p>
+    <p>{{ cabin.avg_rating }}</p>
+    <p>Price: {{ cabin.price }}</p>
+
+    <h3>images</h3>
+    {% if cabin.images|length > 0 %}
+        <ul>
+            {% for image in cabin.images %}
+                <li>
+                    <img src="/static/{{ image }}" width=150px height=150px></img>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>The owner has not added any images yet.</p>
+    {% endif %}
+
+    <h3>reviews</h3>
+    {% if reviews|length > 0 %}
+        <ul>
+            {% for review in reviews %}
+                <li>
+                    <p>{{ review.rating }}/5</p>
+                    {% if review.content is not none %}
+                        <p>{{ review.content }}</p>
+                    {% endif %}
+                    {% if current_user.role == "OWNER" and cabin.iwner_id == current_user.id %}
+                        <button onclick="deleteReview({{ cabin.id }}, {{ review.id }});">
+                            delete
+                        </button>
+                    {% elif current_user.role == "CUSTOMER" and review.user_id == current_user.id %}
+                        <button onclick="deleteReview({{ cabin.id }}, {{ review.id }});">
+                            delete
+                        </button>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reviews given yet.</p>
+    {% endif %}
+    {% if current_user.is_authenticated and curren_user.role == "CUSTOMER" %}
+        <p><a href="/cabin/{{ cabin.id }}/review">Write a review</a></p>
+    {% else %}
+        <p><a href="/login">Log in</a> to write a review</p>
+    {% endif %}
+
+    <h3>reservations</h3>
+    {% if reservations|length > 0 %}
+        <ul>
+            {% for reservation in reservations %}
+                <li>
+                    <p>{{ reservation.start }} - {{ reservation.end }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>This cabin has no reservations currently.
+    {% endif %}
+</div>
+
+{% endblock %}
