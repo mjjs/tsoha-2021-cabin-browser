@@ -4,6 +4,16 @@ class ReservationRepository:
     def __init__(self, connection_pool):
         self._connection_pool = connection_pool
 
+    def add(self, start, end, user_id, cabin_id):
+        cursor = self._connection_pool.cursor()
+        sql = """
+            INSERT INTO reservations(start_date, end_date, user_id, cabin_id)
+            VALUES(%s, %s, %s, %s)
+        """
+        cursor.execute(sql, (start, end, user_id, cabin_id))
+        self._connection_pool.commit()
+        cursor.close()
+
     def get_by_cabin_id(self, cabin_id):
         cursor = self._connection_pool.cursor()
         sql = """

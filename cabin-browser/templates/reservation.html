@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Reserve {{ cabin.name }}</h2>
+<p>Price: {{ cabin.price }} per day.</p>
+<form action="/cabin/{{ cabin.id }}/reservation" method="post">
+    Start date
+    <input id="start-date" type="date" name="start_date">
+    <br>
+    End date
+    <input id="end-date" type="date" name="end_date">
+    <br>
+    <input type="submit" value="Reserve!">
+</form>
+
+<h3>Current reservations</h3>
+{% if current_reservations|length > 0 %}
+    <ul>
+        {% for reservation in current_reservations %}
+            <li>
+                <p>{{ reservation.start }} - {{ reservation.end }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+    <script>
+        const form = document.getElementsByTagName("form")[0];
+        form.onsubmit = (e) => {
+            const price = {{ cabin.price }};
+            const startPicker = document.getElementById("start-date");
+            const endPicker = document.getElementById("end-date");
+
+            if (!startPicker.value || !endPicker.value) {
+                e.preventDefault();
+                alert("Please pick a start and end date.");
+                return;
+            }
+
+            const startDate = new Date(startPicker.value);
+            const endDate = new Date(endPicker.value);
+
+            const days = (endDate - startDate) / 86400000;
+            const totalPrice = days * price;
+
+            if (!confirm(`Reserve {{ cabin.name }} for ${days} day(s)? (${totalPrice} €)`)) {
+                e.preventDefault();
+            }
+        };
+
+        const today = new Date();
+        const startPicker = document.getElementById("start-date");
+        const endPicker = document.getElementById("end-date");
+
+        startPicker.min = today.toISOString().split("T")[0];
+        endPicker.min = today.toISOString().split("T")[0];
+    </script>
+
+{% endblock %}

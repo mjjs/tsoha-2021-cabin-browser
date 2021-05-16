@@ -55,7 +55,7 @@
     {% else %}
         <p>No reviews given yet.</p>
     {% endif %}
-    {% if current_user.is_authenticated and curren_user.role == "CUSTOMER" %}
+    {% if current_user.is_authenticated and current_user.role == "CUSTOMER" %}
         <p><a href="/cabin/{{ cabin.id }}/review">Write a review</a></p>
     {% else %}
         <p><a href="/login">Log in</a> to write a review</p>
@@ -73,6 +73,7 @@
     {% else %}
         <p>This cabin has no reservations currently.
     {% endif %}
+    <a href="/cabin/{{ cabin.id }}/reservation">Reserve this cabin</a>
 </div>
 
 {% endblock %}
