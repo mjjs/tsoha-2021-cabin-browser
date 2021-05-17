@@ -6,6 +6,14 @@
     </head>
     <body>
         <h1>Cabin Browser</h1>
+        <nav>
+            <ul>
+                <li><a href="/cabins">View cabins</a></li>
+                {% if current_user.is_authenticated and current_user.role == "OWNER" %}
+                    <li><a href="/newcabin">Add a cabin</a></li>
+                {% endif %}
+            </ul>
+        </nav>
         {% if current_user.is_authenticated %}
             <p>Logged in as {{ current_user.name }}
             <a href="/logout">Log out</a>

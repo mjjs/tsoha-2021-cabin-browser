@@ -2,7 +2,7 @@ from flask import Flask, g, redirect
 from flask_login import LoginManager
 from uuid import uuid4
 from user import User, UserRole
-from config import FLASK_SECRET_KEY
+from config import FLASK_SECRET_KEY, UPLOAD_FOLDER
 from db import get_db
 
 from login_routes import login_routes
@@ -16,6 +16,7 @@ app.register_blueprint(logout_routes)
 app.register_blueprint(register_routes)
 app.register_blueprint(cabin_routes)
 app.secret_key = FLASK_SECRET_KEY
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 login_manager = LoginManager()
 login_manager.login_view = "login_routes.login_get"

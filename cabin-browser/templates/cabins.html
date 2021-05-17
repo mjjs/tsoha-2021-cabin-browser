@@ -10,7 +10,7 @@
         }
 
         fetch(
-            `/cabin/${cabinId}`,
+            `/cabins/${cabinId}`,
             { method: "DELETE" },
         ).then(() => {
             window.location = `/cabins${window.location.search}`;
@@ -38,7 +38,7 @@
                     <p>No ratings given</p>
                 {% endif %}
                 <p>Price: {{ cabin.price }}€ / day</p>
-                <p><a href="/cabin/{{ cabin.id }}">Details</a></p>
+                <p><a href="/cabins/{{ cabin.id }}">Details</a></p>
 
                 {% if cabin.owner_id == current_user.id %}
                     <button onclick="deleteCabin({{ cabin.id }}, {{ cabin.reservations|length }});">Delete cabin</button>

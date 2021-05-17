@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Add a new cabin</h2>
+
+<form action="/newcabin" method="post" enctype="multipart/form-data">
+Cabin name: <br><input type="text" name="name">
+<br/>
+Cabin address: <br><input type="text" name="address">
+<br/>
+Municipality: <br>
+<select name="municipality">
+    {% for municipality in municipalities %}
+        <option value="{{ municipality.id }}">{{ municipality.name }}</option>
+    {% endfor %}
+</select>
+<br/>
+Price per day(€): <br><input type="number" min="1" step="any" name="price">
+<br/>
+Cabin description: <br><textarea name="description"></textarea>
+<br/>
+Image: <br><input type="file" name="images" multiple="true" onchange="f()">
+<br/>
+<span hidden="true" id="default-image-wrapper">
+    Default image: <br>
+    <select name="default_image"></select>
+    <br>
+</span>
+<input type="submit" value="Add cabin">
+</form>
+
+    <script>
+        const f = () => {
+            const defaultImageSelector = document.getElementsByName("default_image")[0];
+            const oldDefault = defaultImageSelector.value;
+
+            const n = defaultImageSelector.options.length;
+            for (let i = n - 1; i >= 0; i--) {
+                defaultImageSelector.remove(i);
+            }
+
+            const fileList = document.getElementsByName("images")[0].files;
+            for (const file of fileList) {
+                const node = document.createElement("option");
+                node.text = file.name;
+                node.value = file.name;
+                defaultImageSelector.options.add(node);
+
+                if (file.name === oldDefault) {
+                    defaultImageSelector.value = file.name;
+                }
+            }
+
+            document.getElementById("default-image-wrapper").hidden =
+                defaultImageSelector.options.length === 0;
+        }
+    </script>
+
+{% endblock %}

@@ -4,10 +4,10 @@
 <script>
     const deleteReview = (cabinId, reviewId) => {
         fetch(
-            `/cabin/${cabinId}/review/${reviewId}`,
+            `/cabins/${cabinId}/review/${reviewId}`,
             { method: "DELETE" },
         ).then(() => {
-            window.location = `/cabin/${cabinId}`;
+            window.location = `/cabins/${cabinId}`;
         });
     };
 </script>
@@ -56,7 +56,7 @@
         <p>No reviews given yet.</p>
     {% endif %}
     {% if current_user.is_authenticated and current_user.role == "CUSTOMER" %}
-        <p><a href="/cabin/{{ cabin.id }}/review">Write a review</a></p>
+        <p><a href="/cabins/{{ cabin.id }}/review">Write a review</a></p>
     {% else %}
         <p><a href="/login">Log in</a> to write a review</p>
     {% endif %}
@@ -73,7 +73,7 @@
     {% else %}
         <p>This cabin has no reservations currently.
     {% endif %}
-    <a href="/cabin/{{ cabin.id }}/reservation">Reserve this cabin</a>
+    <a href="/cabins/{{ cabin.id }}/reservation">Reserve this cabin</a>
 </div>
 
 {% endblock %}

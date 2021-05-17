@@ -6,6 +6,7 @@ from cabin_repository import CabinRepository
 from review_repository import ReviewRepository
 from cabin_image_repository import CabinImageRepository
 from reservation_repository import ReservationRepository
+from municipality_repository import MunicipalityRepository
 
 DATABASE_INIT_FILE = "create_tables.sql"
 
@@ -37,6 +38,7 @@ class Database:
         self.review_repository = ReviewRepository(self._connection_pool)
         self.cabin_image_repository = CabinImageRepository(self._connection_pool)
         self.reservation_repository = ReservationRepository(self._connection_pool)
+        self.municipality_repository = MunicipalityRepository(self._connection_pool)
 
     def close(self):
         self._connection_pool.close()

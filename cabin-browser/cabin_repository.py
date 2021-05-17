@@ -15,22 +15,25 @@ class CabinRepository:
     def __init__(self, connection_pool):
         self._connection_pool = connection_pool
 
-    def add(self, address, price, description, municipality_id, name, default_image_id):
+    def add(self, address, price, description, municipality_id, name, owner_id):
         cursor = self._connection_pool.cursor()
 
         sql = """
             INSERT INTO cabins
-            (address, price, description, municipality_id, name, default_image_id)
+            (address, price, description, municipality_id, name, owner_id)
             VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING id
         """
 
         try:
             cursor.execute(
                 sql,
-                (address, price, description, municipality_id, name),
+                (address, price, description, municipality_id, name, owner_id),
             )
             self._connection_pool.commit()
-        except IntegrityError:
+            id = cursor.fetchone()[0]
+            return id
+        except IntegrityError as i:
             raise CabinExistsError(address)
         finally:
             cursor.close()

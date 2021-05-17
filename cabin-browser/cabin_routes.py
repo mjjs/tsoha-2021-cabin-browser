@@ -5,6 +5,10 @@ from db import get_db
 from cabin_repository import CabinNotFoundError
 from user_repository import UserNotFoundError
 from user import UserRole
+from werkzeug.utils import secure_filename
+from uuid import uuid4
+from os import path
+from config import UPLOAD_FOLDER
 
 cabin_routes = Blueprint("cabin_routes", __name__, template_folder = "templates")
 
@@ -29,7 +33,7 @@ def cabins_get():
 
     return render_template("cabins.html", cabins = cabins)
 
-@cabin_routes.route("/cabin/<int:id>", methods = ["DELETE"])
+@cabin_routes.route("/cabins/<int:id>", methods = ["DELETE"])
 @login_required
 def cabin_delete(id):
     db = get_db()
@@ -48,7 +52,7 @@ def cabin_delete(id):
 
     return "OK"
 
-@cabin_routes.route("/cabin/<int:id>", methods = ["GET"])
+@cabin_routes.route("/cabins/<int:id>", methods = ["GET"])
 def cabin_get(id):
     db = get_db()
 
@@ -78,7 +82,7 @@ def cabin_get(id):
             reservations = reservations,
     )
 
-@cabin_routes.route("/cabin/<int:id>/review", methods = ["GET"])
+@cabin_routes.route("/cabins/<int:id>/review", methods = ["GET"])
 @login_required
 def review_get(id):
     db = get_db()
@@ -89,7 +93,7 @@ def review_get(id):
     except CabinNotFoundError:
         return render_template("404.html")
 
-@cabin_routes.route("/cabin/<int:id>/review", methods = ["POST"])
+@cabin_routes.route("/cabins/<int:id>/review", methods = ["POST"])
 @login_required
 def review_post(id):
     db = get_db()
@@ -104,9 +108,9 @@ def review_post(id):
             cabin_id = id,
     )
 
-    return redirect(f"/cabin/{id}")
+    return redirect(f"/cabins/{id}")
 
-@cabin_routes.route("/cabin/<int:cabin_id>/review/<int:review_id>", methods = ["DELETE"])
+@cabin_routes.route("/cabins/<int:cabin_id>/review/<int:review_id>", methods = ["DELETE"])
 @login_required
 def review_delete(cabin_id, review_id):
     db = get_db()
@@ -126,7 +130,7 @@ def review_delete(cabin_id, review_id):
 
     return "NOT OK", 403
 
-@cabin_routes.route("/cabin/<int:cabin_id>/reservation", methods = ["GET"])
+@cabin_routes.route("/cabins/<int:cabin_id>/reservation", methods = ["GET"])
 @login_required
 def reservation_get(cabin_id):
     db = get_db()
@@ -142,7 +146,7 @@ def reservation_get(cabin_id):
     except CabinNotFoundError:
         return render_template("404.html"), 404
 
-@cabin_routes.route("/cabin/<int:cabin_id>/reservation", methods = ["POST"])
+@cabin_routes.route("/cabins/<int:cabin_id>/reservation", methods = ["POST"])
 @login_required
 def reservation_post(cabin_id):
     db = get_db()
@@ -193,4 +197,47 @@ def reservation_post(cabin_id):
 
     db.reservation_repository.add(start_date, end_date, current_user.id, cabin_id)
 
-    return redirect(f"/cabin/{cabin_id}")
+    return redirect(f"/cabins/{cabin_id}")
+
+@cabin_routes.route("/newcabin", methods = ["GET"])
+@login_required
+def newcabin_get():
+    if current_user.role != UserRole.CABIN_OWNER.value:
+        return render_template("cabins.html", error_message = "Only cabin owner accounts can add new cabins"), 403
+
+    db = get_db()
+    municipalities = db.municipality_repository.get_all()
+
+    return render_template("addcabin.html", municipalities = municipalities)
+
+@cabin_routes.route("/newcabin", methods = ["POST"])
+@login_required
+def newcabin_post():
+    if current_user.role != UserRole.CABIN_OWNER.value:
+        return render_template("cabins.html", error_message = "Only cabin owner accounts can add new cabins"), 403
+
+    db = get_db()
+
+    # TODO: Validate all of these
+    name = request.form["name"]
+    address = request.form["address"]
+    municipality_id = request.form["municipality"]
+    price = request.form["price"]
+    description = request.form["description"]
+    images = request.files.getlist("images")
+
+    # TODO: Do these in a transaction?
+    cabin_id = db.cabin_repository.add(address, float(price) * 1000000, description, municipality_id, name, current_user.id)
+
+    if "default_image" in request.form:
+        default_image = request.form["default_image"]
+
+        for image in images:
+            ext = path.splitext(image.filename)[1]
+            filename = secure_filename(f"{str(uuid4())}.{ext}")
+            image.save(path.join(UPLOAD_FOLDER, filename))
+            default = default_image == image.filename
+            db.cabin_image_repository.add(filename, cabin_id, default)
+
+
+    return redirect(f"/cabins/{cabin_id}")

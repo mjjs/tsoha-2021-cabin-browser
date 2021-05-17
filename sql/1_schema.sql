@@ -15,7 +15,7 @@ CREATE TABLE cabins (
     id               SERIAL         PRIMARY KEY,
     name             TEXT           NOT NULL,
     address          TEXT           NOT NULL UNIQUE,
-    price            INTEGER        NOT NULL, -- Microcurrency
+    price            BIGINT         NOT NULL, -- Microcurrency
     description      TEXT,
     municipality_id  INTEGER        NOT NULL,
     owner_id         UUID           NOT NULL,
