@@ -19,18 +19,38 @@ Price per day(€): <br><input type="number" min="1" step="any" name="price">
 <br/>
 Cabin description: <br><textarea name="description"></textarea>
 <br/>
-Image: <br><input type="file" name="images" multiple="true" onchange="f()">
+Keywords: <br>
+<select name="keywords" multiple="true">
+    <option value="NONE">None</option>
+    {% for kw in keywords %}
+        <option value="{{ kw.id }}">{{ kw.keyword }}</option>
+    {% endfor %}
+</select>
+<br>
+Can't find your keyword?
+<button type="button" onclick="toggleKwWrapperVisibility()">Add a new one!</button>
+<span hidden="true" id="new-keyword-wrapper">
+    <br>
+    Add new keyword
+    <br>
+    <input type="text" id="new-keyword">
+    <button type="button" onclick="addNewKeyword()">Add</button>
+</span>
+<br/>
+
+Images: <br><input type="file" name="images" multiple="true" onchange="updateDefaultImageSelector()">
 <br/>
 <span hidden="true" id="default-image-wrapper">
     Default image: <br>
     <select name="default_image"></select>
     <br>
 </span>
+<br>
 <input type="submit" value="Add cabin">
 </form>
 
     <script>
-        const f = () => {
+        const updateDefaultImageSelector = () => {
             const defaultImageSelector = document.getElementsByName("default_image")[0];
             const oldDefault = defaultImageSelector.value;
 
@@ -53,7 +73,37 @@ Image: <br><input type="file" name="images" multiple="true" onchange="f()">
 
             document.getElementById("default-image-wrapper").hidden =
                 defaultImageSelector.options.length === 0;
-        }
+        };
+
+        const toggleKwWrapperVisibility = () => {
+            const kwWrapper = document.getElementById("new-keyword-wrapper");
+            kwWrapper.hidden = !kwWrapper.hidden;
+        };
+
+        const addNewKeyword = () => {
+            const keyword = document.getElementById("new-keyword").value;
+
+            fetch("/keywords", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ keyword: keyword }),
+            }).then((res) => {
+                return res.text();
+            }).then((res) => {
+                if (res === "-1") {
+                    alert("Keyword already exists");
+                    return;
+                }
+
+                const keywords = document.getElementsByName("keywords")[0];
+                const node = document.createElement("option");
+                node.text = keyword;
+                node.value = res;
+                keywords.options.add(node);
+                toggleKwWrapperVisibility();
+                document.getElementById("new-keyword").value = null;
+            });
+        };
     </script>
 
 {% endblock %}

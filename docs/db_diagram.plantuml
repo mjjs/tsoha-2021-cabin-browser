@@ -53,11 +53,17 @@ entity cabin_images {
   * cabin_id : INTEGER <<FK>> <<not null>>
 }
 
+entity keywords {
+  * id : INTEGER <<PK>> <<generated>>
+  * keyword : TEXT <<not null>>
+}
+
 cabins ||--o{ reservations
 users ||--o{ reservations
 cabin_images }o--|| cabins
 reviews }o--|| cabins
 reviews }o--|| users
 municipalities ||--o{ cabins
+keywords }o--o{ cabins
 
 @enduml

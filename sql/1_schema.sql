@@ -55,4 +55,17 @@ CREATE TABLE cabin_images(
     FOREIGN KEY(cabin_id) REFERENCES cabins(id) ON DELETE CASCADE
 );
 
+CREATE TABLE keywords(
+    id          SERIAL PRIMARY KEY,
+    keyword     TEXT     NOT NULL UNIQUE
+);
+
+CREATE TABLE cabins_keywords(
+    keyword_id INTEGER NOT NULL,
+    cabin_id   INTEGER NOT NULL,
+
+    FOREIGN KEY(cabin_id) REFERENCES cabins(id) ON DELETE CASCADE,
+    FOREIGN KEY(keyword_id) REFERENCES keywords(id)
+);
+
 CREATE UNIQUE INDEX on cabin_images (cabin_id) WHERE is_default;

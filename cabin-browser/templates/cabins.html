@@ -38,6 +38,15 @@
                     <p>No ratings given</p>
                 {% endif %}
                 <p>Price: {{ cabin.price }}€ / day</p>
+                {% if cabin.keywords|length > 0 %}
+                    <ul>
+                        {% for kw in cabin.keywords %}
+                            <li>
+                                <p>{{ kw.keyword }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
                 <p><a href="/cabins/{{ cabin.id }}">Details</a></p>
 
                 {% if cabin.owner_id == current_user.id %}

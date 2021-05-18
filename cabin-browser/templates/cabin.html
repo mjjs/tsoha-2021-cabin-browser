@@ -18,6 +18,17 @@
     <p>{{ cabin.avg_rating }}</p>
     <p>Price: {{ cabin.price }}</p>
 
+    <h3>keywords</h3>
+    {% if keywords|length > 0 %}
+        <ul>
+            {% for kw in keywords %}
+                <li>
+                    <p>{{ kw.keyword }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
     <h3>images</h3>
     {% if cabin.images|length > 0 %}
         <ul>

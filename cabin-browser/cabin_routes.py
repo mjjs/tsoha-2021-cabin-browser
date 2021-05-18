@@ -30,6 +30,7 @@ def cabins_get():
     for c in cabins:
         c.images = [db.cabin_image_repository.get_default_cabin_image(c.id)]
         c.reservations = db.reservation_repository.get_by_cabin_id(c.id)
+        c.keywords = db.keyword_repository.get_by_cabin_id(c.id)
 
     return render_template("cabins.html", cabins = cabins)
 
@@ -45,9 +46,8 @@ def cabin_delete(id):
 
     if current_user.role == UserRole.CABIN_OWNER.value:
         if cabin.owner_id != current_user.id:
-            return "NOT OK"
+            return "NOT OK", 403
 
-    # TODO: Verify user to be cabin's owner/admin
     db.cabin_repository.delete(id)
 
     return "OK"
@@ -73,6 +73,7 @@ def cabin_get(id):
     reviews = db.review_repository.get_by_cabin_id(id)
     cabin.images = db.cabin_image_repository.get_by_cabin_id(id)
     reservations = db.reservation_repository.get_by_cabin_id(id)
+    keywords = db.keyword_repository.get_by_cabin_id(id)
 
     return render_template(
             "cabin.html",
@@ -80,6 +81,7 @@ def cabin_get(id):
             owner = owner,
             reviews = reviews,
             reservations = reservations,
+            keywords = keywords,
     )
 
 @cabin_routes.route("/cabins/<int:id>/review", methods = ["GET"])
@@ -162,6 +164,7 @@ def reservation_post(cabin_id):
     start_date = date.fromisoformat(request.form["start_date"])
     end_date = date.fromisoformat(request.form["end_date"])
 
+    # TODO: use flash instead of error_message
     if start_date is None or end_date is None:
         return render_template(
                 "reservation.html",
@@ -207,8 +210,9 @@ def newcabin_get():
 
     db = get_db()
     municipalities = db.municipality_repository.get_all()
+    keywords = db.keyword_repository.get_all()
 
-    return render_template("addcabin.html", municipalities = municipalities)
+    return render_template("addcabin.html", municipalities = municipalities, keywords = keywords)
 
 @cabin_routes.route("/newcabin", methods = ["POST"])
 @login_required
@@ -224,10 +228,15 @@ def newcabin_post():
     municipality_id = request.form["municipality"]
     price = request.form["price"]
     description = request.form["description"]
+    keywords = request.form.getlist("keywords")
     images = request.files.getlist("images")
 
     # TODO: Do these in a transaction?
     cabin_id = db.cabin_repository.add(address, float(price) * 1000000, description, municipality_id, name, current_user.id)
+
+    if keywords is not "NONE":
+        for kw in keywords:
+            db.keyword_repository.add_to_cabin(kw, cabin_id)
 
     if "default_image" in request.form:
         default_image = request.form["default_image"]
