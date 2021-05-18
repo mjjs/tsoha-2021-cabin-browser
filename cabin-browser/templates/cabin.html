@@ -34,7 +34,9 @@
         <ul>
             {% for image in cabin.images %}
                 <li>
-                    <img src="/static/{{ image }}" width=150px height=150px></img>
+                    <a href="/static/{{ image }}">
+                        <img src="/static/{{ image }}" width=150px height=150px></img>
+                    </a>
                 </li>
             {% endfor %}
         </ul>
@@ -66,8 +68,10 @@
     {% else %}
         <p>No reviews given yet.</p>
     {% endif %}
-    {% if current_user.is_authenticated and current_user.role == "CUSTOMER" %}
-        <p><a href="/cabins/{{ cabin.id }}/review">Write a review</a></p>
+    {% if current_user.is_authenticated %}
+        {% if current_user.role == "CUSTOMER" %}
+            <p><a href="/cabins/{{ cabin.id }}/review">Write a review</a></p>
+        {% endif %}
     {% else %}
         <p><a href="/login">Log in</a> to write a review</p>
     {% endif %}
@@ -84,7 +88,7 @@
     {% else %}
         <p>This cabin has no reservations currently.
     {% endif %}
-    <a href="/cabins/{{ cabin.id }}/reservation">Reserve this cabin</a>
+    <a href="/reservations/{{ cabin.id }}/reservation">Reserve this cabin</a>
 </div>
 
 {% endblock %}

@@ -28,7 +28,9 @@
                     <br/>
                     {{ cabin.address }}, {{ cabin.municipality }}
                 </h3>
-                <img src="/static/{{ cabin.images[0] }}" width=200px height=200px>
+                <a href="/static/{{ cabin.images[0] }}">
+                    <img src="/static/{{ cabin.images[0] }}" width=200px height=200px>
+                </a>
                 {% if cabin.description %}
                     <p>{{ cabin.description }}</p>
                 {% endif %}
