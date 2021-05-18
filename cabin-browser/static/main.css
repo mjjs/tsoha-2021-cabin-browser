@@ -1,4 +1,4 @@
-#cabin_list {
+ul {
     list-style: none;
 }
 
@@ -9,6 +9,6 @@
     margin-bottom: 2px;
 }
 
-#error-message {
+.error-message {
     color: red;
 }

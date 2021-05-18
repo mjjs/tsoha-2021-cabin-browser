@@ -12,22 +12,37 @@
                 {% if current_user.is_authenticated and current_user.role == "OWNER" %}
                     <li><a href="/newcabin">Add a cabin</a></li>
                 {% endif %}
+                {% if current_user.is_authenticated %}
+                    <li>
+                        Logged in as {{ current_user.name }}
+                        <a href="/logout">Log out</a>
+                    </li>
+                    {% if current_user.role == "OWNER" %}
+                        <br>
+                        <li><a href="/cabins?owner={{ current_user.id }}">My cabins</a></li>
+                    {% endif %}
+                {% else %}
+                    <li>
+                        <a href="/login">Log in</a>
+                        Not an user? <a href=/register>Register now!</a>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
-        {% if current_user.is_authenticated %}
-            <p>Logged in as {{ current_user.name }}
-            <a href="/logout">Log out</a>
-            {% if current_user.role == "OWNER" %}
-                <br>
-                <a href="/cabins?owner={{ current_user.id }}">My cabins</a>
-            {% endif %}
-        {% else %}
-            <a href="/login">Log in</a>
-            <br>
-            Not an user? <a href=/register>Register now!</a>
-        {% endif %}
         <hr>
-        <h1 id="error-message">{{ error_message }}</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                {% for category, message in messages %}
+                    {% if category == "error" %}
+                        <li class="error-message">
+                            {{ message }}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </body>
 </html>

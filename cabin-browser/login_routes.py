@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, flash
 from flask_login import login_user, current_user
 from db import get_db
 from bcrypt import checkpw
@@ -24,7 +24,8 @@ def login_post():
     try:
         user = db.user_repository.get_by_email(email)
     except UserNotFoundError:
-        return render_template("login.html", error_message = INCORRECT_USER_OR_PW_MSG)
+        flash(INCORRECT_USER_OR_PW_MSG, "error")
+        return render_template("login.html")
 
     hashed_password = db.user_repository.get_password_hash_by_user_id(user.id)
 
@@ -32,4 +33,5 @@ def login_post():
         login_user(user)
         return redirect("/")
 
-    return render_template("login.html", error_message = INCORRECT_USER_OR_PW_MSG)
+    flash(INCORRECT_USER_OR_PW_MSG, "error")
+    return render_template("login.html")

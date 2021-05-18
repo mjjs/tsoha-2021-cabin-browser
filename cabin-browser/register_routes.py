@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, request, render_template
+from flask import Blueprint, redirect, request, render_template, flash
 from flask_login import current_user
 from db import get_db
 from bcrypt import hashpw, gensalt
@@ -18,23 +18,31 @@ def render_register_page():
 def register_user():
     db = get_db()
 
+    error = False
+
     name = request.form["name"]
     if not validate_name(name):
-        return render_template("register.html", error_message = "Please enter a non-empty name")
+        flash("Name cannot be empty", "error")
+        error = True
 
     email = request.form["email"]
     if not validate_email(email):
-        return render_template(
-                "register.html", error_message = "Please enter a valid email address")
+        flash("Please enter a valid email address", "error")
+        error = True
 
     password = request.form["password"]
     confirm_password = request.form["confirm_password"]
 
     if not validate_passwords(password, confirm_password):
-        return render_template("register.html", error_message = "Passwords did not match")
+        flash("Passwords did not match", "error")
+        error = True
 
     if not validate_password_complexity(password):
-        return render_template("register.html", error_message = "Some problem with password")
+        flash("To be written")
+        error = True
+
+    if error:
+        return render_template("register.html")
 
     role = request.form["role"]
     # TODO: validate roles

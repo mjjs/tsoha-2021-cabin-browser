@@ -1,5 +1,5 @@
 from datetime import date
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, flash
 from flask_login import login_required, current_user
 from db import get_db
 from cabin_repository import CabinNotFoundError
@@ -88,7 +88,8 @@ def get_cabin(id):
 @login_required
 def new_cabin_page():
     if current_user.role != UserRole.CABIN_OWNER.value:
-        return render_template("cabins.html", error_message = "Only cabin owner accounts can add new cabins"), 403
+        flash("Only cabin owners can add new cabins", "error")
+        return render_template("cabins.html"), 403
 
     db = get_db()
     municipalities = db.municipality_repository.get_all()
@@ -100,7 +101,8 @@ def new_cabin_page():
 @login_required
 def create_new_cabin():
     if current_user.role != UserRole.CABIN_OWNER.value:
-        return render_template("cabins.html", error_message = "Only cabin owner accounts can add new cabins"), 403
+        flash("Only cabin owners can add new cabins", "error")
+        return render_template("cabins.html"), 403
 
     db = get_db()
 

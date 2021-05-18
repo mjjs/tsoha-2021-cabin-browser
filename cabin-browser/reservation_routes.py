@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, flash
 from flask_login import login_required, current_user
 from db import get_db
 from cabin_repository import CabinNotFoundError
@@ -38,39 +38,34 @@ def reservation_post(cabin_id):
     start_date = date.fromisoformat(request.form["start_date"])
     end_date = date.fromisoformat(request.form["end_date"])
 
-    # TODO: use flash instead of error_message
-    if start_date is None or end_date is None:
-        return render_template(
-                "reservation.html",
-                error_message = "Please pick a start and end date.",
-                cabin = cabin)
+    error = False
+    if start_date is None:
+        flash("Please pick a start date", "error")
+        error = True
+    if end_date is None:
+        flash("Please pick an end date", "error")
+        error = True
 
     if start_date > end_date:
-        return render_template(
-                "reservation.html",
-                error_message = "The start date must be before the end date.",
-                cabin = cabin)
+        flash("The start date must be before the end date", "error")
+        error = True
 
     today = date.today()
     if start_date < today or end_date < today:
-        return render_template(
-                "reservation.html",
-                error_message = "The reservation must not be in the past.",
-                cabin = cabin)
-
+        flash("The reservation must not be in the past", "error")
+        error = True
 
     for reservation in current_reservations:
         if reservation.start <= start_date <= reservation.end:
-            return render_template(
-                    "reservation.html",
-                    error_message = "The selected dates have already been reserved.",
-                    cabin = cabin)
+            flash("The selected dates have already been reserved", "error")
+            error = True
+        elif reservation.start <= end_date <= reservation.end:
+            flash("The selected dates have already been reserved", "error")
+            error = True
 
-        if reservation.start <= end_date <= reservation.end:
-            return render_template(
-                    "reservation.html",
-                    error_message = "The selected dates have already been reserved.",
-                    cabin = cabin)
+
+    if error:
+        return render_template("reservation.html", cabin = cabin)
 
     db.reservation_repository.add(start_date, end_date, current_user.id, cabin_id)
 
