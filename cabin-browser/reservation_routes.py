@@ -42,6 +42,7 @@ def reservation_post(cabin_id):
     if start_date is None:
         flash("Please pick a start date", "error")
         error = True
+
     if end_date is None:
         flash("Please pick an end date", "error")
         error = True

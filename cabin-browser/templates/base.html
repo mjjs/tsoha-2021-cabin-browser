@@ -33,13 +33,13 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <ul>
-                {% for category, message in messages %}
-                    {% if category == "error" %}
-                        <li class="error-message">
-                            {{ message }}
-                        </li>
-                    {% endif %}
-                {% endfor %}
+                    {% for category, message in messages %}
+                        {% if category == "error" %}
+                            <li class="error-message">
+                                {{ message }}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
                 </ul>
             {% endif %}
         {% endwith %}
