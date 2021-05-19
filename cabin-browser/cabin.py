@@ -1,3 +1,5 @@
+from json import dumps
+
 class Cabin:
     def __init__(self, id, name, address, price,
             description, municipality, avg_rating,

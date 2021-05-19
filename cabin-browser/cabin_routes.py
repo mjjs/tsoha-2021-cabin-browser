@@ -32,7 +32,9 @@ def get_all_cabins():
         c.reservations = db.reservation_repository.get_by_cabin_id(c.id)
         c.keywords = db.keyword_repository.get_by_cabin_id(c.id)
 
-    return render_template("cabins.html", cabins = cabins)
+    all_keywords = db.keyword_repository.get_all()
+
+    return render_template("cabins.html", cabins = cabins, keywords = all_keywords)
 
 @cabin_routes.route("/cabins/<int:id>", methods = ["DELETE"])
 @login_required

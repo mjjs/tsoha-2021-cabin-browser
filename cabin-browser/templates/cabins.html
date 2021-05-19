@@ -18,7 +18,58 @@
     };
 </script>
 
+<script>
+    const selectedKeywords = new Set();
+
+    const filterCabins = (keyword) => {
+        if (selectedKeywords.has(keyword)) {
+            selectedKeywords.delete(keyword);
+        } else {
+            selectedKeywords.add(keyword);
+        }
+
+        const cabinList = document.getElementById("cabin_list");
+
+        for (const cabin of cabinList.children) {
+            const keywordList = cabin.getElementsByClassName("keywords")[0];
+
+            if (selectedKeywords.size === 0) {
+                cabin.hidden = false;
+                continue;
+            }
+
+            if (!keywordList) {
+                cabin.hidden = true;
+                continue;
+            }
+
+            let matchedKeywords = 0;
+
+            for (const kw of keywordList.children) {
+                console.log(`${kw.textContent.trim()} ???`)
+                if (selectedKeywords.has(kw.textContent.trim())) {
+                    matchedKeywords++;
+                }
+            }
+
+            cabin.hidden = !(matchedKeywords === selectedKeywords.size);
+        }
+    };
+</script>
+
 <h2>Cabins</h2>
+<div id="cabin-filters">
+    <ul>
+        {% for kw in keywords %}
+            <li>
+                <input type="checkbox" onclick="filterCabins('{{ kw.keyword }}');">
+                    {{ kw.keyword }}
+                </input>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
 <ul id="cabin_list">
     {% for cabin in cabins %}
         <li>
@@ -41,7 +92,7 @@
                 {% endif %}
                 <p>Price: {{ cabin.price }}€ / day</p>
                 {% if cabin.keywords|length > 0 %}
-                    <ul>
+                    <ul class="keywords">
                         {% for kw in cabin.keywords %}
                             <li>
                                 <p>{{ kw.keyword }}</p>
