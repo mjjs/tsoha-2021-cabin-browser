@@ -4,4 +4,5 @@ INSERT INTO cabin_images(filename, cabin_id, is_default) VALUES
     ('moekki-549ec2b3-9914-4a7e-88e5-61216f557b4a.jpg', 2, true),
     ('chalet-les-anges-luxury-log-cabin.jpg', 2, false),
     ('gnjuidhg8734.jpg', 3, true),
+    ('Islanti-vuokramokki.jpg', 5, true),
     ('Woods-Cabin-1.jpg', 3, false);

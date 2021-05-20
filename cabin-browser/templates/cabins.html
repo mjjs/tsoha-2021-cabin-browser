@@ -19,18 +19,33 @@
 </script>
 
 <script>
+    const NO_CHANGE = -1;
     const selectedKeywords = new Set();
+    let selectedMunicipality = undefined;
 
-    const filterCabins = (keyword) => {
-        if (selectedKeywords.has(keyword)) {
-            selectedKeywords.delete(keyword);
-        } else {
-            selectedKeywords.add(keyword);
+    const filterCabins = (keyword, municipality) => {
+        if (keyword !== NO_CHANGE) {
+            selectedKeywords.has(keyword)
+                ? selectedKeywords.delete(keyword)
+                : selectedKeywords.add(keyword);
+        }
+
+        if (municipality !== NO_CHANGE) {
+            selectedMunicipality = municipality;
         }
 
         const cabinList = document.getElementById("cabin_list");
 
         for (const cabin of cabinList.children) {
+            const cabinMunicipality = cabin.getElementsByClassName("cabin-municipality")[0].textContent.trim();
+
+            if (selectedMunicipality && cabinMunicipality !== selectedMunicipality) {
+                console.log(selectedMunicipality);
+                console.log(cabinMunicipality);
+                cabin.hidden = true;
+                continue;
+            }
+
             const keywordList = cabin.getElementsByClassName("keywords")[0];
 
             if (selectedKeywords.size === 0) {
@@ -46,7 +61,6 @@
             let matchedKeywords = 0;
 
             for (const kw of keywordList.children) {
-                console.log(`${kw.textContent.trim()} ???`)
                 if (selectedKeywords.has(kw.textContent.trim())) {
                     matchedKeywords++;
                 }
@@ -55,6 +69,38 @@
             cabin.hidden = !(matchedKeywords === selectedKeywords.size);
         }
     };
+
+    //const setMunicipalityFilter = (municipality) => {
+    //    const currentMunicipality = getURLParam("municipality");
+    //    console.log(currentMunicipality);
+    //    console.log(municipality);
+    //    if (currentMunicipality === municipality) {
+    //        return;
+    //    }
+
+
+    //    if (!currentMunicipality) {
+    //        const empty = window.location.search === "";
+    //        window.location.search = empty
+    //            ? `?municipality=${municipality}`
+    //            : window.location.search.concat(`&municipality=${municipality}`);
+    //    } else {
+    //        window.location.search = window.location.replace(
+    //            `municipality=${currentMunicipality}`,
+    //            `municipality=${municipality}`,
+    //        );
+    //    }
+    //};
+
+    //const getURLParams = () => window.location.search
+    //    .substring(1)
+    //    .split("&")
+    //    .reduce((acc, curr) => {
+    //        const parts = curr.split("=");
+    //        return acc.set(parts[0], parts[1]);
+    //    }, new Map());
+
+    //const getURLParam = (param) => getURLParams().get(param);
 </script>
 
 <h2>Cabins</h2>
@@ -62,23 +108,30 @@
     <ul>
         {% for kw in keywords %}
             <li>
-                <input type="checkbox" onclick="filterCabins('{{ kw.keyword }}');">
+                <input type="checkbox" onclick="filterCabins('{{ kw.keyword }}', NO_CHANGE);">
                     {{ kw.keyword }}
                 </input>
             </li>
         {% endfor %}
     </ul>
+    <select>
+        <option onclick="filterCabins(NO_CHANGE, undefined)">
+            Any
+        </option>
+        {% for municipality in municipalities %}
+            <option onclick="filterCabins(NO_CHANGE, '{{ municipality.name }}')">
+                {{ municipality.name }}
+            </option>
+        {% endfor %}
+    </select>
 </div>
 
 <ul id="cabin_list">
     {% for cabin in cabins %}
         <li>
             <div class="cabin-card">
-                <h3>
-                    {{ cabin.name }}
-                    <br/>
-                    {{ cabin.address }}, {{ cabin.municipality }}
-                </h3>
+                <h3>Name: {{ cabin.name }}</h3>
+                <h3>Address: {{ cabin.address }}, <span class="cabin-municipality">{{ cabin.municipality }}</span></h3>
                 <a href="/static/{{ cabin.images[0] }}">
                     <img src="/static/{{ cabin.images[0] }}" width=200px height=200px>
                 </a>
