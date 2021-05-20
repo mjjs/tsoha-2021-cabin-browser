@@ -1,6 +1,6 @@
 from psycopg2 import connect, extras
 from flask import g
-from config import DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME
+from config import DATABASE_URL
 from user_repository import UserRepository
 from cabin_repository import CabinRepository
 from review_repository import ReviewRepository
@@ -17,13 +17,7 @@ def get_db():
     db = getattr(g, "_database", None)
 
     if db is None:
-        connection_pool = connect(
-                database = DATABASE_NAME,
-                user = DATABASE_USERNAME,
-                password = DATABASE_PASSWORD,
-                host = DATABASE_HOST,
-                port = DATABASE_PORT,
-                )
+        connection_pool = connect(DATABASE_URL)
 
         database = Database(connection_pool)
 

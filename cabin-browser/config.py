@@ -19,10 +19,6 @@ def env_var_or_default(env_var, default):
     return default
 
 
-DATABASE_HOST = ensure_env_var("DATABASE_HOST")
-DATABASE_USERNAME = ensure_env_var("DATABASE_USERNAME")
-DATABASE_PASSWORD = ensure_env_var("DATABASE_PASSWORD")
-DATABASE_PORT = ensure_env_var("DATABASE_PORT")
-DATABASE_NAME = ensure_env_var("DATABASE_NAME")
+DATABASE_URL = ensure_env_var("DATABASE_URL")
 FLASK_SECRET_KEY = ensure_env_var("FLASK_SECRET_KEY")
 UPLOAD_FOLDER = path.join(getcwd(), env_var_or_default("UPLOAD_FOLDER", "static"))
