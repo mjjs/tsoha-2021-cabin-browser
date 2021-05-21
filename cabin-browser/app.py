@@ -2,7 +2,7 @@ from flask import Flask, g, redirect
 from flask_login import LoginManager
 from uuid import uuid4
 from user import User, UserRole
-from config import FLASK_SECRET_KEY, UPLOAD_FOLDER
+from config import FLASK_SECRET_KEY, UPLOAD_FOLDER, ENVIRONMENT, PORT
 from db import get_db
 
 from login_routes import login_routes
@@ -45,7 +45,11 @@ def index_get():
     return redirect("/cabins")
 
 def main():
-    app.run(debug = True)
+    app.run(
+            debug = ENVIRONMENT == "DEV",
+            host = "0.0.0.0",
+            port = PORT,
+            )
 
 if __name__ == "__main__":
     main()

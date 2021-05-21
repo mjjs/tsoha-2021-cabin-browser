@@ -1,6 +1,16 @@
 # Dev environment for the application
 version: '3'
 services:
+  cabin-browser:
+    build: .
+    depends_on:
+      - "db"
+    environment:
+      - DATABASE_URL=postgresql://cabin-browser:secret@db:5432/cabin-browser
+      - FLASK_SECRET_KEY=secret
+    ports:
+      - 5000:5000
+
   db:
     image: postgres:13.2
     healthcheck:

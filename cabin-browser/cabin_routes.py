@@ -121,7 +121,7 @@ def create_new_cabin():
     # TODO: Do these in a transaction?
     cabin_id = db.cabin_repository.add(address, float(price) * 1000000, description, municipality_id, name, current_user.id)
 
-    if keywords is not "NONE":
+    if keywords != "NONE":
         for kw in keywords:
             db.keyword_repository.add_to_cabin(kw, cabin_id)
 
@@ -130,7 +130,7 @@ def create_new_cabin():
 
         for image in images:
             ext = path.splitext(image.filename)[1]
-            filename = secure_filename(f"{str(uuid4())}.{ext}")
+            filename = secure_filename(f"{str(uuid4())}{ext}")
             image.save(path.join(UPLOAD_FOLDER, filename))
             default = default_image == image.filename
             db.cabin_image_repository.add(filename, cabin_id, default)
