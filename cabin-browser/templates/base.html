@@ -2,47 +2,54 @@
 <html>
     <head>
         <link rel="stylesheet" href="/static/main.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <title>Cabin Browser</title>
     </head>
     <body>
-        <h1>Cabin Browser</h1>
-        <nav>
-            <ul>
-                <li><a href="/cabins">View cabins</a></li>
-                {% if current_user.is_authenticated and current_user.role == "OWNER" %}
-                    <li><a href="/newcabin">Add a cabin</a></li>
-                {% endif %}
-                {% if current_user.is_authenticated %}
-                    <li>
-                        Logged in as {{ current_user.name }}
-                        <a href="/logout">Log out</a>
-                    </li>
-                    {% if current_user.role == "OWNER" %}
-                        <br>
-                        <li><a href="/cabins?owner={{ current_user.id }}">My cabins</a></li>
-                    {% endif %}
-                {% else %}
-                    <li>
-                        <a href="/login">Log in</a>
-                        Not an user? <a href=/register>Register now!</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-        <hr>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul>
-                    {% for category, message in messages %}
-                        {% if category == "error" %}
-                            <li class="error-message">
-                                {{ message }}
+        <div class="container">
+            <div class="navbar sticky-top navbar-dark bg-dark">
+                <h1>Cabin Browser</h1>
+                <nav>
+                    <ul>
+                        <li><a href="/cabins">View cabins</a></li>
+                        {% if current_user.is_authenticated and current_user.role == "OWNER" %}
+                            <li><a href="/newcabin">Add a cabin</a></li>
+                        {% endif %}
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.role == "OWNER" %}
+                                <li><a href="/cabins?owner={{ current_user.id }}">My cabins</a></li>
+                            {% endif %}
+                            <li>
+                                Logged in as {{ current_user.name }}
+                                <a href="/logout" class="log">Log out</a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="/login" class="log">Log in</a>
+                                Not an user? <a href=/register>Register now!</a>
                             </li>
                         {% endif %}
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        {% block content %}{% endblock %}
+                    </ul>
+                </nav>
+            </div>
+            <hr>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul>
+                        {% for category, message in messages %}
+                            {% if category == "error" %}
+                                <li class="alert alert-danger" role="alert">
+                                    {{ message }}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+            </div>
     </body>
 </html>

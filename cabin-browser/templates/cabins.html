@@ -7,6 +7,10 @@
             if (!confirm("The cabin has reservations and they will be deleted. Are you sure?")) {
                 return;
             }
+        } else {
+            if (!confirm("Are you sure you want to delete the cabin?")) {
+                return;
+            }
         }
 
         fetch(
@@ -34,14 +38,12 @@
             selectedMunicipality = municipality;
         }
 
-        const cabinList = document.getElementById("cabin_list");
+        const cabinList = document.getElementById("cabin-list");
 
         for (const cabin of cabinList.children) {
             const cabinMunicipality = cabin.getElementsByClassName("cabin-municipality")[0].textContent.trim();
 
             if (selectedMunicipality && cabinMunicipality !== selectedMunicipality) {
-                console.log(selectedMunicipality);
-                console.log(cabinMunicipality);
                 cabin.hidden = true;
                 continue;
             }
@@ -69,98 +71,96 @@
             cabin.hidden = !(matchedKeywords === selectedKeywords.size);
         }
     };
-
-    //const setMunicipalityFilter = (municipality) => {
-    //    const currentMunicipality = getURLParam("municipality");
-    //    console.log(currentMunicipality);
-    //    console.log(municipality);
-    //    if (currentMunicipality === municipality) {
-    //        return;
-    //    }
-
-
-    //    if (!currentMunicipality) {
-    //        const empty = window.location.search === "";
-    //        window.location.search = empty
-    //            ? `?municipality=${municipality}`
-    //            : window.location.search.concat(`&municipality=${municipality}`);
-    //    } else {
-    //        window.location.search = window.location.replace(
-    //            `municipality=${currentMunicipality}`,
-    //            `municipality=${municipality}`,
-    //        );
-    //    }
-    //};
-
-    //const getURLParams = () => window.location.search
-    //    .substring(1)
-    //    .split("&")
-    //    .reduce((acc, curr) => {
-    //        const parts = curr.split("=");
-    //        return acc.set(parts[0], parts[1]);
-    //    }, new Map());
-
-    //const getURLParam = (param) => getURLParams().get(param);
 </script>
 
 <h2>Cabins</h2>
 <div id="cabin-filters">
-    <ul>
-        {% for kw in keywords %}
-            <li>
-                <input type="checkbox" onclick="filterCabins('{{ kw.keyword }}', NO_CHANGE);">
-                    {{ kw.keyword }}
-                </input>
-            </li>
-        {% endfor %}
-    </ul>
-    <select>
-        <option onclick="filterCabins(NO_CHANGE, undefined)">
-            Any
-        </option>
-        {% for municipality in municipalities %}
-            <option onclick="filterCabins(NO_CHANGE, '{{ municipality.name }}')">
-                {{ municipality.name }}
-            </option>
-        {% endfor %}
-    </select>
+    <div>Filter the cabins by keywords</div>
+    {% for kw in keywords %}
+        <div class="form-check form-check-inline">
+            <input id="{{kw}}" class="form-check-input" type="checkbox" onclick="filterCabins('{{ kw.keyword }}', NO_CHANGE);">
+            <label class="form-check-label" for="{{kw}}">
+                {{ kw.keyword }}
+            </label>
+        </div>
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-md-3">
+            <select class="custom-select">
+                <option onclick="filterCabins(NO_CHANGE, undefined)">
+                    Any
+                </option>
+                {% for municipality in municipalities %}
+                    <option onclick="filterCabins(NO_CHANGE, '{{ municipality.name }}')">
+                        {{ municipality.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <br>
 </div>
 
-<ul id="cabin_list">
+<div id="cabin-list" class="card-deck">
     {% for cabin in cabins %}
-        <li>
-            <div class="cabin-card">
-                <h3>Name: {{ cabin.name }}</h3>
-                <h3>Address: {{ cabin.address }}, <span class="cabin-municipality">{{ cabin.municipality }}</span></h3>
+            <div class="card">
                 <a href="/static/{{ cabin.images[0] }}">
-                    <img src="/static/{{ cabin.images[0] }}" width=200px height=200px>
+                    <div class="card-img-top" style="background-image: url(/static/{{ cabin.images[0] }})"></div>
                 </a>
-                {% if cabin.description %}
-                    <p>{{ cabin.description }}</p>
-                {% endif %}
-                {% if cabin.avg_rating %}
-                    <p>Rating: {{ cabin.avg_rating }} / 5</p>
-                {% else %}
-                    <p>No ratings given</p>
-                {% endif %}
-                <p>Price: {{ cabin.price }}€ / day</p>
-                {% if cabin.keywords|length > 0 %}
-                    <ul class="keywords">
-                        {% for kw in cabin.keywords %}
-                            <li>
-                                <p>{{ kw.keyword }}</p>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-                <p><a href="/cabins/{{ cabin.id }}">Details</a></p>
 
-                {% if cabin.owner_id == current_user.id %}
-                    <button onclick="deleteCabin({{ cabin.id }}, {{ cabin.reservations|length }});">Delete cabin</button>
-                {% endif %}
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <a href="/cabins/{{ cabin.id }}">{{ cabin.name }}</a>
+                        <div class="stars">
+                            {% if cabin.avg_rating %}
+                                {% for i in range(cabin.avg_rating) %}
+                                    ★
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </h3>
+
+                    <div class="card-subtitle cabin-card-address">
+                        {{ cabin.address }},
+                        <span class="cabin-municipality">{{ cabin.municipality }}</span>
+                    </div>
+
+                    {% if cabin.keywords|length > 0 %}
+                        <span class="keywords">
+                            {% for kw in cabin.keywords %}
+                                <span class="badge badge-primary">
+                                    {{ kw.keyword }}
+                                </span>
+                            {% endfor %}
+                        </span>
+
+                        <br>
+                        <br>
+                    {% endif %}
+
+                    <div class="card-text">
+                        <p>{{ cabin.price }}€ / day</p>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent">
+                    <a href="/cabins/{{ cabin.id }}" class="btn btn-primary">
+                        Details
+                    </a>
+
+                    {% if cabin.owner_id == current_user.id %}
+                        <button
+                            type="button"
+                            onclick="deleteCabin({{ cabin.id }}, {{ cabin.reservations|length }});"
+                            class="btn btn-danger" >
+                            Delete cabin
+                        </button>
+                    {% endif %}
+                </div>
+
             </div>
-        </li>
     {% endfor %}
-</ul>
+</div>
 
 {% endblock %}

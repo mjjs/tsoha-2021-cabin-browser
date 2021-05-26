@@ -12,71 +12,80 @@
     };
 </script>
 
-<h2>{{ cabin.name }} </h2>
-<div id="cabin">
-    <p>{{ cabin.description }}</p>
-    <p>{{ cabin.avg_rating }}</p>
-    <p>Price: {{ cabin.price }}</p>
-
-    <h3>keywords</h3>
-    {% if keywords|length > 0 %}
-        <ul>
-            {% for kw in keywords %}
-                <li>
-                    <p>{{ kw.keyword }}</p>
-                </li>
+<h2>
+    {{ cabin.name }}
+    <span class="stars">
+        {% if cabin.avg_rating %}
+            {% for i in range(cabin.avg_rating) %}
+                ★
             {% endfor %}
-        </ul>
-    {% endif %}
-
-    <h3>images</h3>
-    {% if cabin.images|length > 0 %}
-        <ul>
-            {% for image in cabin.images %}
-                <li>
-                    <a href="/static/{{ image }}">
-                        <img src="/static/{{ image }}" width=150px height=150px></img>
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>The owner has not added any images yet.</p>
-    {% endif %}
-
-    <h3>reviews</h3>
-    {% if reviews|length > 0 %}
-        <ul>
-            {% for review in reviews %}
-                <li>
-                    <p>{{ review.rating }}/5</p>
-                    {% if review.content is not none %}
-                        <p>{{ review.content }}</p>
-                    {% endif %}
-                    {% if current_user.role == "OWNER" and cabin.iwner_id == current_user.id %}
-                        <button onclick="deleteReview({{ cabin.id }}, {{ review.id }});">
-                            delete
-                        </button>
-                    {% elif current_user.role == "CUSTOMER" and review.user_id == current_user.id %}
-                        <button onclick="deleteReview({{ cabin.id }}, {{ review.id }});">
-                            delete
-                        </button>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No reviews given yet.</p>
-    {% endif %}
-    {% if current_user.is_authenticated %}
-        {% if current_user.role == "CUSTOMER" %}
-            <p><a href="/cabins/{{ cabin.id }}/review">Write a review</a></p>
         {% endif %}
+    </span>
+</h2>
+
+
+<div id="image-carousel" data-ride="carousel" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+        {% for i in range(cabin.images|length) %}
+            {% if i == 0 %}
+                <li data-target="#image-carousel" data-slide-to="{{ i }}" class="active"></li>
+            {% else %}
+                <li data-target="#image-carousel" data-slide-to="{{ i }}"></li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+
+    <div class="carousel-inner">
+        {% for i in range(cabin.images|length) %}
+            {% if i == 0 %}
+                <div class="carousel-item active">
+                    <a href="/static/{{ cabin.images[i] }}">
+                        <img src="/static/{{ cabin.images[i] }}" class="d-block w-100"></img>
+                    </a>
+                </div>
+            {% else %}
+                <div class="carousel-item">
+                    <a href="/static/{{ cabin.images[i] }}">
+                        <img src="/static/{{ cabin.images[i] }}" class="d-block w-100"></img>
+                    </a>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <a class="carousel-control-prev" href="#image-carousel" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidde="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+
+    <a class="carousel-control-next" href="#image-carousel" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidde="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+</div>
+
+<div id="cabin">
+    <h3>Description</h3>
+    {% if cabin.description %}
+        <p>{{ cabin.description }}</p>
     {% else %}
-        <p><a href="/login">Log in</a> to write a review</p>
+        <p>The cabin owner has added no description.</p>
+    {% endif %}
+    <p><strong>Price:</strong> {{ cabin.price }}€ / night</p>
+    <p>Questions? <a href="mailto:{{ owner.email }}">Email the owner.</a></p>
+
+    <h3>Keywords</h3>
+    {% if keywords|length > 0 %}
+        {% for kw in keywords %}
+            <span class="badge badge-primary">
+                {{ kw.keyword }}
+            </span>
+        {% endfor %}
+    {% else %}
+        <p>The cabin owner has added no keywords for this cabin.</p>
     {% endif %}
 
-    <h3>reservations</h3>
+    <h3>Reservations</h3>
     {% if reservations|length > 0 %}
         <ul>
             {% for reservation in reservations %}
@@ -88,7 +97,77 @@
     {% else %}
         <p>This cabin has no reservations currently.
     {% endif %}
-    <a href="/reservations/{{ cabin.id }}">Reserve this cabin</a>
+    {% if current_user.is_authenticated %}
+        <p>
+            <a class="btn btn-primary" href="/reservations/{{ cabin.id }}">
+                Reserve this cabin
+            </a>
+        </p>
+    {% else %}
+        <p>
+            <a href="/login">Log in</a> to reserve this cabin.
+        </p>
+    {% endif %}
+
+    <h3>Reviews</h3>
+    {% if reviews|length > 0 %}
+        <p>
+            The cabin has received an average rating of
+            {{ cabin.avg_rating }}/5 based on {{ reviews|length }} reviews
+        </p>
+
+        {% if current_user.is_authenticated %}
+            {% if current_user.role == "CUSTOMER" %}
+                <p>
+                    <a class="btn btn-outline-primary" href="/cabins/{{ cabin.id }}/review">
+                        Write a review
+                    </a>
+                </p>
+            {% endif %}
+        {% else %}
+            <p>
+                <a href="/login">Log in</a> to write a review.
+            </p>
+        {% endif %}
+
+        <hr>
+        {% for review in reviews %}
+            <div class="review">
+                <div class="card review-card">
+                    <div class="stars review-stars card-title">
+                        {% for i in range(review.rating) %}
+                            ★
+                        {% endfor %}
+                    </div>
+
+                    <p class="card-text">
+                        {% if review.content %}
+                                <span class="review-content">{{ review.content }}</span>
+                        {% else %}
+                            No content
+                        {% endif %}
+                    </p>
+
+                    {% if current_user.role == "OWNER" and cabin.owner_id == current_user.id %}
+                        <div class="card-footer bg-transparent">
+                            <button class="btn btn-danger" onclick="deleteReview({{ cabin.id }}, {{ review.id }});">
+                                Delete review
+                            </button>
+                        </div>
+                    {% elif current_user.role == "CUSTOMER" and review.user_id == current_user.id %}
+                        <div class="card-footer bg-transparent">
+                            <button class="btn btn-danger" onclick="deleteReview({{ cabin.id }}, {{ review.id }});">
+                                Delete review
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No reviews given yet.</p>
+    {% endif %}
+
 </div>
 
 {% endblock %}
