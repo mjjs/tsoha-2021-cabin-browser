@@ -4,49 +4,94 @@
 <h2>Add a new cabin</h2>
 
 <form action="/newcabin" method="post" enctype="multipart/form-data">
-Cabin name: <br><input type="text" name="name">
-<br/>
-Cabin address: <br><input type="text" name="address">
-<br/>
-Municipality: <br>
-<select name="municipality">
-    {% for municipality in municipalities %}
-        <option value="{{ municipality.id }}">{{ municipality.name }}</option>
-    {% endfor %}
-</select>
-<br/>
-Price per day(€): <br><input type="number" min="1" step="any" name="price">
-<br/>
-Cabin description: <br><textarea name="description"></textarea>
-<br/>
-Keywords: <br>
-<select name="keywords" multiple="true">
-    <option value="NONE">None</option>
-    {% for kw in keywords %}
-        <option value="{{ kw.id }}">{{ kw.keyword }}</option>
-    {% endfor %}
-</select>
-<br>
-Can't find your keyword?
-<button type="button" onclick="toggleKwWrapperVisibility()">Add a new one!</button>
-<span hidden="true" id="new-keyword-wrapper">
-    <br>
-    Add new keyword
-    <br>
-    <input type="text" id="new-keyword">
-    <button type="button" onclick="addNewKeyword()">Add</button>
-</span>
-<br/>
+    <div class="form-group">
+        <label>
+            Cabin name
+            <br>
+            <input class="form-control" type="text" name="name" required>
+        </label>
+    </div>
 
-Images: <br><input type="file" name="images" multiple="true" onchange="updateDefaultImageSelector()">
-<br/>
-<span hidden="true" id="default-image-wrapper">
-    Default image: <br>
-    <select name="default_image"></select>
-    <br>
-</span>
-<br>
-<input type="submit" value="Add cabin">
+    <div class="form-group">
+        <label>
+            Cabin address
+            <br>
+            <input class="form-control" type="text" name="address" required>
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label>
+            Municipality
+            <br>
+            <select class="form-control" name="municipality">
+                {% for municipality in municipalities %}
+                    <option value="{{ municipality.id }}">{{ municipality.name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label>
+            Price per day(€)
+            <br>
+            <input class="form-control" type="number" min="1" step="any" name="price" required>
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label>
+            Cabin description
+            <br>
+            <textarea class="form-control" name="description"></textarea>
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label>
+            Cabin keywords (ctrl+click to select multiple)
+            <br>
+            <select class="form-control" name="keywords" multiple="true">
+                <option value="NONE">None</option>
+                {% for kw in keywords %}
+                    <option value="{{ kw.id }}">{{ kw.keyword }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+
+    <div class="form-group">
+        Can't find your keyword?
+        <br>
+        <button class="btn btn-primary btn-sm" type="button" onclick="toggleKwWrapperVisibility()">Add a new keyword</button>
+        <div hidden="true" id="new-keyword-wrapper">
+            <br>
+            <label>
+                <p>New keyword</p>
+                <input class="form-control" type="text" id="new-keyword">
+            </label>
+            <button class="btn btn-primary btn-sm" type="button" onclick="addNewKeyword()">Add</button>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>
+            Images
+            <br>
+            <input class="form-control-file" type="file" name="images" multiple="true" onchange="updateDefaultImageSelector()">
+        </label>
+    </div>
+
+    <div hidden="true" id="default-image-selector" class="form-group">
+        <label>
+            Default image
+            <br>
+            <select name="default_image"></select>
+        </label>
+    </div>
+
+    <input class="btn btn-primary" type="submit" value="Add cabin">
 </form>
 
     <script>
@@ -71,7 +116,7 @@ Images: <br><input type="file" name="images" multiple="true" onchange="updateDef
                 }
             }
 
-            document.getElementById("default-image-wrapper").hidden =
+            document.getElementById("default-image-selector").hidden =
                 defaultImageSelector.options.length === 0;
         };
 

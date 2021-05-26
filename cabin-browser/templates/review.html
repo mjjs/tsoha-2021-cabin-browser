@@ -4,19 +4,27 @@
 <h2>Write a review for {{ cabin.name }}</h2>
 <div id="review">
     <form action="/cabins/{{ cabin.id }}/review" method="post">
-        <label>
-            Rating:
-            <select name="rating">
-                <option value=1>1</option>
-                <option value=2>2</option>
-                <option value=3>3</option>
-                <option value=4>4</option>
-                <option value=5>5</option>
-            </select>
-        </label>
-        <br>
-        <textarea name="content" placeholder="Optional message"></textarea>
-        <input type="submit" value="Send review">
+        <div class="form-group">
+            <label>
+                Rating
+                <br>
+                <select class="form-control" name="rating">
+                    <option value=1>1</option>
+                    <option value=2>2</option>
+                    <option value=3>3</option>
+                    <option value=4>4</option>
+                    <option value=5>5</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="form-group">
+            Optional message
+            <br>
+            <textarea class="form-control" name="content" placeholder="Write your message here"></textarea>
+        </div>
+
+        <input class="btn btn-primary" type="submit" value="Send review">
     </form>
 </div>
 
