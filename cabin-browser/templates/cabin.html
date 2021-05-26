@@ -148,13 +148,12 @@
                         {% endif %}
                     </p>
 
-                    {% if current_user.role == "OWNER" and cabin.owner_id == current_user.id %}
-                        <div class="card-footer bg-transparent">
-                            <button class="btn btn-danger" onclick="deleteReview({{ cabin.id }}, {{ review.id }});">
-                                Delete review
-                            </button>
-                        </div>
-                    {% elif current_user.role == "CUSTOMER" and review.user_id == current_user.id %}
+                    {% if (
+                        current_user.is_authenticated
+                        and (current_user.role == "ADMIN")
+                        or (current_user.role == "OWNER" and cabin.owner_id == current_user.id)
+                        or (current_user.role == "CUSTOMER" and review.user_id == current_user.id)
+                    ) %}
                         <div class="card-footer bg-transparent">
                             <button class="btn btn-danger" onclick="deleteReview({{ cabin.id }}, {{ review.id }});">
                                 Delete review

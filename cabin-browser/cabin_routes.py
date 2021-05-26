@@ -123,7 +123,8 @@ def create_new_cabin():
 
     if keywords != "NONE":
         for kw in keywords:
-            db.keyword_repository.add_to_cabin(kw, cabin_id)
+            if kw != "NONE":
+                db.keyword_repository.add_to_cabin(kw, cabin_id)
 
     if "default_image" in request.form:
         default_image = request.form["default_image"]
