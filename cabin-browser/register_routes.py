@@ -22,19 +22,19 @@ def register_user():
 
     name = request.form["name"]
     if not validate_name(name):
-        flash("Name cannot be empty", "error")
+        flash("Name cannot be empty.", "error")
         error = True
 
     email = request.form["email"]
     if not validate_email(email):
-        flash("Please enter a valid email address", "error")
+        flash("Please enter a valid email address.", "error")
         error = True
 
     password = request.form["password"]
     confirm_password = request.form["confirm_password"]
 
     if not validate_passwords(password, confirm_password):
-        flash("Passwords did not match", "error")
+        flash("Passwords did not match.", "error")
         error = True
 
     if not validate_password_complexity(password):
@@ -52,7 +52,8 @@ def register_user():
     try:
         db.user_repository.add(email, name, hashed_password, role)
     except UserExistsError:
-        raise NotImplementedError("Duplicate emails are not handled yet")
+        flash("A user already exists with the given email.", "error")
+        return render_template("register.html")
 
     return redirect("/login")
 
