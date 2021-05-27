@@ -105,7 +105,7 @@
 <div id="cabin-list" class="card-deck">
     {% for cabin in cabins %}
             <div class="card">
-                <a href="/static/{{ cabin.images[0] }}">
+                <a href="/cabins/{{ cabin.id }}">
                     <div class="card-img-top" style="background-image: url(/static/{{ cabin.images[0] }})"></div>
                 </a>
 
