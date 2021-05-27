@@ -1,5 +1,6 @@
+from base64 import b64encode
 from datetime import date
-from flask import Blueprint, render_template, request, redirect, flash
+from flask import Blueprint, render_template, request, redirect, flash, Response
 from flask_login import login_required, current_user
 from db import get_db
 from cabin_repository import CabinNotFoundError
@@ -130,11 +131,10 @@ def create_new_cabin():
         default_image = request.form["default_image"]
 
         for image in images:
-            ext = path.splitext(image.filename)[1]
-            filename = secure_filename(f"{str(uuid4())}{ext}")
-            image.save(path.join(UPLOAD_FOLDER, filename))
+            mimetype = image.mimetype
+            b64 = b64encode(image.read()).decode()
             default = default_image == image.filename
-            db.cabin_image_repository.add(filename, cabin_id, default)
+            db.cabin_image_repository.add(f"{mimetype};base64,{b64}", cabin_id, default)
 
 
     return redirect(f"/cabins/{cabin_id}")

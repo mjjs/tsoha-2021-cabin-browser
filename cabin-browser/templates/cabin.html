@@ -40,13 +40,13 @@
             {% if i == 0 %}
                 <div class="carousel-item active">
                     <a href="/static/{{ cabin.images[i] }}">
-                        <img src="/static/{{ cabin.images[i] }}" class="d-block w-100"></img>
+                        <img src="data:{{ cabin.images[i] }}" class="d-block w-100"></img>
                     </a>
                 </div>
             {% else %}
                 <div class="carousel-item">
                     <a href="/static/{{ cabin.images[i] }}">
-                        <img src="/static/{{ cabin.images[i] }}" class="d-block w-100"></img>
+                        <img src="data:{{ cabin.images[i] }}" class="d-block w-100"></img>
                     </a>
                 </div>
             {% endif %}

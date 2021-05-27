@@ -48,7 +48,7 @@ CREATE TABLE reservations (
 
 CREATE TABLE cabin_images(
     id          SERIAL  PRIMARY KEY,
-    filename    TEXT    NOT NULL,
+    data        TEXT    NOT NULL,
     cabin_id    INTEGER NOT NULL,
     is_default  BOOLEAN NOT NULL,
 

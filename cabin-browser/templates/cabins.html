@@ -106,7 +106,7 @@
     {% for cabin in cabins %}
             <div class="card">
                 <a href="/cabins/{{ cabin.id }}">
-                    <div class="card-img-top" style="background-image: url(/static/{{ cabin.images[0] }})"></div>
+                    <div class="card-img-top" style="background-image: url(data:{{ cabin.images[0] }})"></div>
                 </a>
 
                 <div class="card-body">
