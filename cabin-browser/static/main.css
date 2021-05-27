@@ -14,6 +14,10 @@
     text-decoration: none;
 }
 
+.form-group label {
+    display: block;
+}
+
 .log {
     display: block;
     text-align: right;
