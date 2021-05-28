@@ -4,47 +4,32 @@ The application is a summer cabin browser for Finland. A cabin owner can list th
 summer cabin into the site and regular users can browse, rate, and book these cabins
 for the summer.
 
-## Functionality
-### Users
-A user of the site can register a new username. The user can either register as
-a regular user (customer) or a cabin owner. The application also has a single
-admin user that will be created during application initialization.
+A live demo is up at [https://cabin-browser.herokuapp.com/](https://cabin-browser.herokuapp.com).
+The demo is running on Heroku free-tier, so it might take a while to start up if there have been
+no visitors lately.
 
-#### Cabin owner
-A cabin owner can add/remove their cabin(s) from the website.
+## Plan
+The original plan can be found over at [plan.md](./docs/plan.md).
 
-#### Customer
-A customer can browse the cabins and reserve it for given days. The customer can
-also leave reviews for the cabins.
+## State of the project
+The project is almost completely finished. There are some finishing touches I want to do to it, but other than that, I think it's ready.
 
-#### Admin
-An admin can delete users, cabins, and reviews if necessary.
+## Testing in Heroku
+The application can be found [here](https://cabin-browser.herokuapp.com). There are a few pre-made users that can be used when testing the application:
 
-### Cabins
-#### Cabin adding
-When adding a cabin to the website, the cabin owner can supply the following
-information about it:
-* name
-* location
-* description
-* price (€/day)
+Customer:
+* kalle.kayttaja@email.com : salasana
 
-The cabin can also be added under labels such as "sauna", "lake", etc.
+Cabin owners:
+* olli.omistaja@email.com : salasana
+* otso.omistaja@email.com : salasana
 
-#### Cabin listing
-The cabins are shown as a list to the user. The list can be filtered by municipality
-and labels. The list can be sorted by price or review score.
+You can also register a new user if you want. You can browse the cabins and add reviews/reservations to cabins as a customer. If you log in as a cabin owner, you can add new cabins also.
 
-#### Detailed info page
-When a cabin is clicked in the list view, the user is taken to a detailed information
-page of said cabin. The page shows all the information that the cabin owner has
-entered plus all the reviews from the other customers. New reviews are able to be
-left from this page as well.
-
-From the info page, the customer can select dates and reserve the cabin if it's
-available.
-
-## Database
-The application will have the following database model:
-
-![Database diagram](./docs/db_diagram.svg)
+## TODO
+* Prevent uploading of non-image files
+* Compress images (find a good quality/size ratio)
+* Fix image links
+  * In a real application I would store the images on disk or in an S3 bucket. S3, however, might be overkill for a school project and Heroku clears all disk files on restart.
+* Add timestamps to reviews
+* Refactor code

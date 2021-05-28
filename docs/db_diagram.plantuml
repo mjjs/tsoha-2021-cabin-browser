@@ -47,7 +47,7 @@ entity reservations {
 
 entity cabin_images {
   * id : INTEGER <<PK>> <<generated>>
-  * filename : TEXT <<not null>>
+  * data : TEXT <<not null>> <<base64>>
   * is_default : BOOLEAN <<not null>>
   ---
   * cabin_id : INTEGER <<FK>> <<not null>>
