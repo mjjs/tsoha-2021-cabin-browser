@@ -27,8 +27,6 @@ Cabin owners:
 You can also register a new user if you want. You can browse the cabins and add reviews/reservations to cabins as a customer. If you log in as a cabin owner, you can add new cabins also.
 
 ## TODO
-* Prevent uploading of non-image files
-* Compress images (find a good quality/size ratio)
 * Fix image links
   * In a real application I would store the images on disk or in an S3 bucket. S3, however, might be overkill for a school project and Heroku clears all disk files on restart.
 * Add timestamps to reviews

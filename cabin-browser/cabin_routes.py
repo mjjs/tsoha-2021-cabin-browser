@@ -1,4 +1,5 @@
 from base64 import b64encode
+from imghdr import what
 from datetime import date
 from flask import Blueprint, render_template, request, redirect, flash, Response
 from flask_login import login_required, current_user
@@ -118,6 +119,16 @@ def create_new_cabin():
     description = request.form["description"]
     keywords = request.form.getlist("keywords")
     images = request.files.getlist("images")
+
+    for image in images:
+        if what(None, h = image.read()) not in ["jpeg", "png"]:
+            flash("Only jpeg or png images are supported", "error")
+
+            return render_template(
+                    "addcabin.html",
+                    municipalities = db.municipality_repository.get_all(),
+                    keywords = db.keyword_repository.get_all(),
+                    )
 
     # TODO: Do these in a transaction?
     cabin_id = db.cabin_repository.add(address, float(price) * 1000000, description, municipality_id, name, current_user.id)
