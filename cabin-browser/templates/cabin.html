@@ -115,21 +115,23 @@
             The cabin has received an average rating of
             {{ cabin.avg_rating }}/5 based on {{ reviews|length }} reviews
         </p>
+    {% endif %}
 
-        {% if current_user.is_authenticated %}
-            {% if current_user.role == "CUSTOMER" %}
-                <p>
-                    <a class="btn btn-outline-primary" href="/cabins/{{ cabin.id }}/review">
-                        Write a review
-                    </a>
-                </p>
-            {% endif %}
-        {% else %}
+    {% if current_user.is_authenticated %}
+        {% if current_user.role == "CUSTOMER" %}
             <p>
-                <a href="/login">Log in</a> to write a review.
+                <a class="btn btn-outline-primary" href="/cabins/{{ cabin.id }}/review">
+                    Write a review
+                </a>
             </p>
         {% endif %}
+    {% else %}
+        <p>
+            <a href="/login">Log in</a> to write a review.
+        </p>
+    {% endif %}
 
+    {% if reviews|length > 0 %}
         <hr>
         {% for review in reviews %}
             <div class="review">
