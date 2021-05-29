@@ -1,9 +1,10 @@
-from flask import Flask, g, redirect
+from flask import Flask, g, redirect, render_template
 from flask_login import LoginManager
 from uuid import uuid4
 from user import User, UserRole
-from config import FLASK_SECRET_KEY, UPLOAD_FOLDER, ENVIRONMENT, PORT
+from config import FLASK_SECRET_KEY, UPLOAD_FOLDER, ENVIRONMENT, PORT, MAX_CONTENT_LENGTH
 from db import get_db
+from werkzeug.exceptions import RequestEntityTooLarge
 
 from login_routes import login_routes
 from logout_routes import logout_routes
@@ -23,6 +24,7 @@ app.register_blueprint(reservation_routes)
 app.register_blueprint(review_routes)
 app.secret_key = FLASK_SECRET_KEY
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 
 login_manager = LoginManager()
 login_manager.login_view = "login_routes.login_get"
@@ -33,6 +35,11 @@ def close_connection(exception):
     db = getattr(g, "_database", None)
     if db:
         db.close()
+
+@app.errorhandler(413)
+@app.errorhandler(RequestEntityTooLarge)
+def handle_too_large_files(e):
+    return render_template("too_large_file.html")
 
 @login_manager.user_loader
 def load_user(user_id):
