@@ -130,6 +130,8 @@ def create_new_cabin():
                     keywords = db.keyword_repository.get_all(),
                     )
 
+        image.seek(0)
+
     # TODO: Do these in a transaction?
     cabin_id = db.cabin_repository.add(address, float(price) * 1000000, description, municipality_id, name, current_user.id)
 
