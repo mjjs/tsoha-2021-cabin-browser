@@ -8,7 +8,7 @@ class ReservationRepository:
         cursor = self._connection_pool.cursor()
         sql = """
             INSERT INTO reservations(start_date, end_date, user_id, cabin_id)
-            VALUES(%s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s)
         """
         cursor.execute(sql, (start, end, user_id, cabin_id))
         self._connection_pool.commit()
