@@ -16,7 +16,7 @@ extras.register_uuid()
 def get_db():
     db = getattr(g, "_database", None)
 
-    if db is None:
+    if not db:
         connection_pool = connect(DATABASE_URL)
 
         database = Database(connection_pool)

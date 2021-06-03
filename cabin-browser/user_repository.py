@@ -41,7 +41,7 @@ class UserRepository:
         )
         row = cursor.fetchone()
 
-        if row is None:
+        if not row:
             raise UserNotFoundError("email", email)
 
         (id, email, name, role) = row
@@ -56,7 +56,7 @@ class UserRepository:
         cursor.execute("SELECT password FROM users WHERE id = %s", (id,))
         row = cursor.fetchone()
 
-        if row is None:
+        if not row:
             raise UserNotFoundError("ID", id)
 
         password_hash = row[0]
@@ -73,7 +73,7 @@ class UserRepository:
         )
         row = cursor.fetchone()
 
-        if row is None:
+        if not row:
             raise UserNotFoundError("id", id)
 
         (id, email, name, role) = row

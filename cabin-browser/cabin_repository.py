@@ -129,7 +129,7 @@ class CabinRepository:
         cursor.execute(sql, (id,))
 
         row = cursor.fetchone()
-        if row is None:
+        if not row:
             raise CabinNotFoundError(id)
 
         (cabin_id, cabin_name, cabin_address, cabin_price, cabin_description,

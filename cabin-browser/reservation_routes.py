@@ -39,11 +39,11 @@ def reservation_post(cabin_id):
     end_date = date.fromisoformat(request.form["end_date"])
 
     error = False
-    if start_date is None:
+    if not start_date:
         flash("Please pick a start date", "error")
         error = True
 
-    if end_date is None:
+    if not end_date:
         flash("Please pick an end date", "error")
         error = True
 

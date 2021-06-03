@@ -31,7 +31,7 @@ class ReviewRepository:
         cursor.execute(sql, (id,))
         row = cursor.fetchone()
 
-        if row is None:
+        if not row:
             raise ReviewNotFoundError(id)
 
         (id, content, rating, user_id, cabin_id) = row

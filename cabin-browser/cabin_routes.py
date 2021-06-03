@@ -17,7 +17,7 @@ cabin_routes = Blueprint("cabin_routes", __name__, template_folder = "templates"
 @cabin_routes.route("/cabins", methods = ["GET"])
 def get_all_cabins():
     user_id = request.args.get("owner")
-    if user_id is not None:
+    if user_id:
         if current_user.role == UserRole.CUSTOMER.value:
             return redirect("/cabins")
 
