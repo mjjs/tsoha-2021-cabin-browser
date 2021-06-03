@@ -4,15 +4,22 @@
 <h2>Reserve {{ cabin.name }}</h2>
 <p>Price: {{ cabin.price }} per day.</p>
 <form action="/reservations/{{ cabin.id }}" method="post">
-    Start date
-    <input id="start-date" type="date" name="start_date">
-    <br>
-    End date
-    <input id="end-date" type="date" name="end_date">
-    <br>
-    <input type="submit" value="Reserve!">
-</form>
+    <div class="form-group">
+        <label>
+            Start date <br>
+            <input class="form-control" id="start-date" type="date" name="start_date">
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            End date <br>
+            <input class="form-control" id="end-date" type="date" name="end_date">
+        </label>
+    </div>
 
+    <input class="btn btn-primary" type="submit" value="Reserve!">
+</form>
+<br>
 <h3>Current reservations</h3>
 {% if current_reservations|length > 0 %}
     <ul>
@@ -54,6 +61,15 @@
 
         startPicker.min = today.toISOString().split("T")[0];
         endPicker.min = today.toISOString().split("T")[0];
+
+        startPicker.onchange = (e) => {
+            const [year, month, day] = e.currentTarget.value.split("-");
+            endPicker.min = new Date(
+                Number(year),
+                Number(month)-1,
+                Number(day)+2,
+            ).toISOString().split("T")[0];
+        };
     </script>
 
 {% endblock %}
