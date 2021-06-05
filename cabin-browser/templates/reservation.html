@@ -2,7 +2,7 @@
 {% block content %}
 
 <h2>Reserve {{ cabin.name }}</h2>
-<p>Price: {{ cabin.price }} per day.</p>
+<p>Price: {{ cabin.price }} € per day.</p>
 <form action="/reservations/{{ cabin.id }}" method="post">
     <div class="form-group">
         <label>
