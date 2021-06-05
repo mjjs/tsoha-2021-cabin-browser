@@ -150,4 +150,5 @@ def create_new_cabin():
             db.cabin_image_repository.add(f"{mimetype};base64,{b64}", cabin_id, default)
 
 
+    flash("Cabin added.", "success")
     return redirect(f"/cabins/{cabin_id}")

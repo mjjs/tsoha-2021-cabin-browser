@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, flash
 from flask_login import login_required, current_user
 from db import get_db
 from cabin_repository import CabinNotFoundError
@@ -32,6 +32,8 @@ def review_post(id):
             user_id = current_user.id,
             cabin_id = id,
     )
+
+    flash("Review added.", "success")
 
     return redirect(f"/cabins/{id}")
 

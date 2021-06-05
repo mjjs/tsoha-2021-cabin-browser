@@ -39,15 +39,11 @@
         {% for i in range(cabin.images|length) %}
             {% if i == 0 %}
                 <div class="carousel-item active">
-                    <a href="/static/{{ cabin.images[i] }}">
-                        <img src="data:{{ cabin.images[i] }}" class="d-block w-100"></img>
-                    </a>
+                    <img src="data:{{ cabin.images[i] }}" class="d-block w-100"></img>
                 </div>
             {% else %}
                 <div class="carousel-item">
-                    <a href="/static/{{ cabin.images[i] }}">
-                        <img src="data:{{ cabin.images[i] }}" class="d-block w-100"></img>
-                    </a>
+                    <img src="data:{{ cabin.images[i] }}" class="d-block w-100"></img>
                 </div>
             {% endif %}
         {% endfor %}
@@ -105,7 +101,7 @@
         </p>
     {% else %}
         <p>
-            <a href="/login">Log in</a> to reserve this cabin.
+            <a href="/login?next=/reservations/{{ cabin.id }}">Log in</a> to reserve this cabin.
         </p>
     {% endif %}
 
@@ -127,7 +123,7 @@
         {% endif %}
     {% else %}
         <p>
-            <a href="/login">Log in</a> to write a review.
+            <a href="/login?next=/cabins/{{ cabin.id }}/review">Log in</a> to write a review.
         </p>
     {% endif %}
 

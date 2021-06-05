@@ -41,11 +41,14 @@ def register_user():
         flash("To be written")
         error = True
 
-    if error:
-        return render_template("register.html")
 
     role = request.form["role"]
-    # TODO: validate roles
+    if not validate_role(role):
+        flash("An invalid role was supplied.")
+        error = True
+
+    if error:
+        return render_template("register.html")
 
     hashed_password = hashpw(password.encode("utf-8"), gensalt())
 
@@ -55,17 +58,20 @@ def register_user():
         flash("A user already exists with the given email.", "error")
         return render_template("register.html")
 
+    flash("Register successful. You can now log in.", "success")
     return redirect("/login")
 
 def validate_name(name):
     return name != ""
 
 def validate_email(email):
-    # TODO: Proper email validation(?)
     return match(r".+@.+\..+", email) is not None
 
 def validate_passwords(password, confirm_password):
     return password == confirm_password
+
+def validate_role(role):
+    return role in ("CUSTOMER", "OWNER")
 
 def validate_password_complexity(password):
     # TODO: implement this
