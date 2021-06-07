@@ -135,10 +135,8 @@ def create_new_cabin():
     # TODO: Do these in a transaction?
     cabin_id = db.cabin_repository.add(address, float(price) * 1000000, description, municipality_id, name, current_user.id)
 
-    if keywords != "NONE":
-        for kw in keywords:
-            if kw != "NONE":
-                db.keyword_repository.add_to_cabin(kw, cabin_id)
+    for kw in keywords:
+        db.keyword_repository.add_to_cabin(kw, cabin_id)
 
     if "default_image" in request.form:
         default_image = request.form["default_image"]

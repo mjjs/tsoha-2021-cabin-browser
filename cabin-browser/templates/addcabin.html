@@ -52,27 +52,31 @@
         <label>
             Cabin keywords (ctrl+click to select multiple)
             <br>
-            <select class="form-control" name="keywords" multiple="true">
-                <option value="NONE">None</option>
+            <select class="form-control" name="keywords" id="keywords" multiple="true">
                 {% for kw in keywords %}
                     <option value="{{ kw.id }}">{{ kw.keyword }}</option>
                 {% endfor %}
             </select>
         </label>
+        <button class="btn btn-primary btn-sm" type="button" onclick="clearKeywords()">Clear selection</button>
     </div>
 
     <div class="form-group">
         Can't find your keyword?
         <br>
-        <button class="btn btn-primary btn-sm" type="button" onclick="toggleKwWrapperVisibility()">Add a new keyword</button>
-        <div hidden="true" id="new-keyword-wrapper">
-            <br>
-            <label>
-                <p>New keyword</p>
-                <input class="form-control" type="text" id="new-keyword">
-            </label>
-            <button class="btn btn-primary btn-sm" type="button" onclick="addNewKeyword()">Add</button>
-        </div>
+        <details>
+            <summary class="btn btn-primary btn-sm">
+                Add a new keyword
+            </summary>
+            <div id="new-keyword-wrapper">
+                <br>
+                <label>
+                    <p>New keyword</p>
+                    <input class="form-control" type="text" id="new-keyword">
+                </label>
+                <button class="btn btn-primary btn-sm" type="button" onclick="addNewKeyword()">Add</button>
+            </div>
+        </details>
     </div>
 
     <div class="form-group">
@@ -87,7 +91,7 @@
         <label>
             Default image
             <br>
-            <select name="default_image"></select>
+            <select class="form-control" name="default_image"></select>
         </label>
     </div>
 
@@ -120,11 +124,6 @@
                 defaultImageSelector.options.length === 0;
         };
 
-        const toggleKwWrapperVisibility = () => {
-            const kwWrapper = document.getElementById("new-keyword-wrapper");
-            kwWrapper.hidden = !kwWrapper.hidden;
-        };
-
         const addNewKeyword = () => {
             const keyword = document.getElementById("new-keyword").value;
 
@@ -148,6 +147,11 @@
                 toggleKwWrapperVisibility();
                 document.getElementById("new-keyword").value = null;
             });
+        };
+
+        const clearKeywords = () => {
+            const keywordSelect = document.getElementById("keywords");
+            keywordSelect.value = null;
         };
     </script>
 
