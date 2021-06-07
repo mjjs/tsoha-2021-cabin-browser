@@ -120,6 +120,8 @@ def create_new_cabin():
     keywords = request.form.getlist("keywords")
     images = request.files.getlist("images")
 
+    images = [img for img in images if img.filename != ""]
+
     for image in images:
         if what(None, h = image.read()) not in ["jpeg", "png"]:
             flash("Only jpeg or png images are supported", "error")
