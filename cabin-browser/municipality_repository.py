@@ -1,5 +1,7 @@
-from municipality import Municipality
-
+class Municipality:
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
 
 class MunicipalityRepository:
     def __init__(self, connection_pool):

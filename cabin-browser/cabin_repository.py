@@ -1,8 +1,7 @@
 from psycopg2 import IntegrityError
 from cabin import Cabin
-from municipality import Municipality
+from municipality_repository import Municipality
 from user import User
-
 
 class CabinExistsError(Exception):
     def __init__(self, address):
@@ -36,7 +35,7 @@ class CabinRepository:
             self._connection_pool.commit()
             id = cursor.fetchone()[0]
             return id
-        except IntegrityError as i:
+        except IntegrityError:
             raise CabinExistsError(address)
         finally:
             cursor.close()
