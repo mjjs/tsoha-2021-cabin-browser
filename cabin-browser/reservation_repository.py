@@ -19,7 +19,8 @@ class ReservationRepository:
         cursor = self._connection_pool.cursor()
         sql = """
             SELECT id, start_date, end_date, user_id, cabin_id FROM reservations
-            WHERE cabin_id = %s
+            WHERE cabin_id = %s AND start_date > CURRENT_DATE
+            ORDER BY start_date ASC
         """
         cursor.execute(sql, (cabin_id,))
         rows = cursor.fetchall()
