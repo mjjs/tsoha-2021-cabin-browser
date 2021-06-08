@@ -1,8 +1,10 @@
 from review import Review
 
+
 class ReviewNotFoundError(Exception):
     def __init__(self, id):
         super().__init__(f"Review with id {id} not found in the database")
+
 
 class ReviewRepository:
     def __init__(self, connection_pool):

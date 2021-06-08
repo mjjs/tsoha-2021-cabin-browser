@@ -3,13 +3,16 @@ from cabin import Cabin
 from municipality import Municipality
 from user import User
 
+
 class CabinExistsError(Exception):
     def __init__(self, address):
         super().__init__(f"Cabin with address {address} already exists in the database")
 
+
 class CabinNotFoundError(Exception):
     def __init__(self, id):
         super().__init__(f"Cabin with id {id} not found in the database")
+
 
 class CabinRepository:
     def __init__(self, connection_pool):
@@ -63,18 +66,28 @@ class CabinRepository:
         rows = cursor.fetchall()
 
         cabins = []
-        for (id, name, address, price, description,
-                municipality_name, avg_rating, owner_id) in rows:
-            cabins.append(Cabin(
-                id = id,
-                name = name,
-                price = price / 1000000,
-                description = description,
-                address = address,
-                municipality = municipality_name,
-                avg_rating = avg_rating,
-                owner_id = owner_id,
-            ))
+        for (
+            id,
+            name,
+            address,
+            price,
+            description,
+            municipality_name,
+            avg_rating,
+            owner_id,
+        ) in rows:
+            cabins.append(
+                Cabin(
+                    id=id,
+                    name=name,
+                    price=price / 1000000,
+                    description=description,
+                    address=address,
+                    municipality=municipality_name,
+                    avg_rating=avg_rating,
+                    owner_id=owner_id,
+                )
+            )
 
         return cabins
 
@@ -97,19 +110,27 @@ class CabinRepository:
         rows = cursor.fetchall()
 
         return [
-                Cabin(
-                    id = cabin_id,
-                    name = cabin_name,
-                    price = cabin_price / 1000000,
-                    description = cabin_description,
-                    address = cabin_address,
-                    municipality = municipality_name,
-                    avg_rating = avg_rating,
-                    owner_id = owner_id,
-                )
-                for (cabin_id, cabin_name, cabin_address, cabin_price, cabin_description,
-                        municipality_name, avg_rating, owner_id) in rows
-            ]
+            Cabin(
+                id=cabin_id,
+                name=cabin_name,
+                price=cabin_price / 1000000,
+                description=cabin_description,
+                address=cabin_address,
+                municipality=municipality_name,
+                avg_rating=avg_rating,
+                owner_id=owner_id,
+            )
+            for (
+                cabin_id,
+                cabin_name,
+                cabin_address,
+                cabin_price,
+                cabin_description,
+                municipality_name,
+                avg_rating,
+                owner_id,
+            ) in rows
+        ]
 
     def get(self, id):
         cursor = self._connection_pool.cursor()
@@ -132,16 +153,24 @@ class CabinRepository:
         if not row:
             raise CabinNotFoundError(id)
 
-        (cabin_id, cabin_name, cabin_address, cabin_price, cabin_description,
-                        municipality_name, avg_rating, owner_id) = row
+        (
+            cabin_id,
+            cabin_name,
+            cabin_address,
+            cabin_price,
+            cabin_description,
+            municipality_name,
+            avg_rating,
+            owner_id,
+        ) = row
 
         return Cabin(
-            id = cabin_id,
-            name = cabin_name,
-            price = cabin_price / 1000000,
-            description = cabin_description,
-            address = cabin_address,
-            municipality = municipality_name,
-            avg_rating = avg_rating,
-            owner_id = owner_id,
+            id=cabin_id,
+            name=cabin_name,
+            price=cabin_price / 1000000,
+            description=cabin_description,
+            address=cabin_address,
+            municipality=municipality_name,
+            avg_rating=avg_rating,
+            owner_id=owner_id,
         )

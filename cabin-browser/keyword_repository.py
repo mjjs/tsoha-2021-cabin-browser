@@ -1,13 +1,16 @@
 from psycopg2 import IntegrityError
 
+
 class Keyword:
     def __init__(self, id, keyword):
         self.id = id
         self.keyword = keyword
 
+
 class KeywordExistsError(Exception):
     def __init__(self, keyword):
         super().__init__(f"The keyword {keyword} already exists in the database")
+
 
 class KeywordRepository:
     def __init__(self, connection_pool):

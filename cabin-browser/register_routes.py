@@ -4,18 +4,26 @@ from db import get_db
 from bcrypt import hashpw, gensalt
 from user_repository import UserExistsError
 from re import match
-from validators import validate_name, validate_email, passwords_match, validate_password_complexity, validate_role
+from validators import (
+    validate_name,
+    validate_email,
+    passwords_match,
+    validate_password_complexity,
+    validate_role,
+)
 
-register_routes = Blueprint("register_routes", __name__, template_folder = "templates")
+register_routes = Blueprint("register_routes", __name__, template_folder="templates")
 
-@register_routes.route("/register", methods = ["GET"])
+
+@register_routes.route("/register", methods=["GET"])
 def render_register_page():
     if current_user.is_authenticated:
         return redirect("/")
 
     return render_template("register.html")
 
-@register_routes.route("/register", methods = ["POST"])
+
+@register_routes.route("/register", methods=["POST"])
 def register_user():
     db = get_db()
 
@@ -41,7 +49,6 @@ def register_user():
     if not validate_password_complexity(password):
         flash("To be written")
         error = True
-
 
     role = request.form["role"]
     if not validate_role(role):

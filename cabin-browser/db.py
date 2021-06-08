@@ -13,6 +13,7 @@ DATABASE_INIT_FILE = "create_tables.sql"
 
 extras.register_uuid()
 
+
 def get_db():
     db = getattr(g, "_database", None)
 
@@ -24,6 +25,7 @@ def get_db():
         db = g._database = database
 
     return db
+
 
 class Database:
     def __init__(self, connection_pool):

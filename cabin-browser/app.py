@@ -1,7 +1,13 @@
 from flask import Flask, g, redirect, render_template
 from flask_login import LoginManager
 from werkzeug.exceptions import RequestEntityTooLarge
-from config import FLASK_SECRET_KEY, UPLOAD_FOLDER, ENVIRONMENT, PORT, MAX_CONTENT_LENGTH
+from config import (
+    FLASK_SECRET_KEY,
+    UPLOAD_FOLDER,
+    ENVIRONMENT,
+    PORT,
+    MAX_CONTENT_LENGTH,
+)
 from db import get_db
 
 from login_routes import login_routes
@@ -28,16 +34,19 @@ login_manager = LoginManager()
 login_manager.login_view = "login_routes.login_get"
 login_manager.init_app(app)
 
+
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, "_database", None)
     if db:
         db.close()
 
+
 @app.errorhandler(413)
 @app.errorhandler(RequestEntityTooLarge)
 def handle_too_large_files(e):
     return render_template("too_large_file.html")
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -45,16 +54,19 @@ def load_user(user_id):
         db = get_db()
         return db.user_repository.get(user_id)
 
-@app.route("/", methods = ["GET"])
+
+@app.route("/", methods=["GET"])
 def index_get():
     return redirect("/cabins")
 
+
 def main():
     app.run(
-            debug = ENVIRONMENT == "DEV",
-            host = "0.0.0.0",
-            port = PORT,
-            )
+        debug=ENVIRONMENT == "DEV",
+        host="0.0.0.0",
+        port=PORT,
+    )
+
 
 if __name__ == "__main__":
     main()

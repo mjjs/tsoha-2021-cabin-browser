@@ -5,10 +5,11 @@ from bcrypt import checkpw
 from db import get_db
 from user_repository import UserNotFoundError
 
-login_routes = Blueprint("login_routes", __name__, template_folder = "templates")
+login_routes = Blueprint("login_routes", __name__, template_folder="templates")
 INCORRECT_USER_OR_PW_MSG = "Incorrect username or password"
 
-@login_routes.route("/login", methods = ["GET"])
+
+@login_routes.route("/login", methods=["GET"])
 def login_get():
     if current_user.is_authenticated:
         flash("You must log out before logging in", "error")
@@ -18,10 +19,10 @@ def login_get():
     if not is_safe_url(next_page):
         return render_template("login.html", **request.args)
 
-    return render_template("login.html", next_page = next_page or "")
+    return render_template("login.html", next_page=next_page or "")
 
 
-@login_routes.route("/login", methods = ["POST"])
+@login_routes.route("/login", methods=["POST"])
 def login_post():
     db = get_db()
 
@@ -51,8 +52,8 @@ def login_post():
 
     return redirect(next_page or "/")
 
+
 def is_safe_url(url):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, url))
-    return test_url.scheme in ("http", "https") and \
-           ref_url.netloc == test_url.netloc
+    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc

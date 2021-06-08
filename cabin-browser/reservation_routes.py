@@ -4,9 +4,12 @@ from db import get_db
 from cabin_repository import CabinNotFoundError
 from datetime import date
 
-reservation_routes = Blueprint("reservation_routes", __name__, template_folder = "templates")
+reservation_routes = Blueprint(
+    "reservation_routes", __name__, template_folder="templates"
+)
 
-@reservation_routes.route("/reservations/<int:cabin_id>", methods = ["GET"])
+
+@reservation_routes.route("/reservations/<int:cabin_id>", methods=["GET"])
 @login_required
 def reservation_get(cabin_id):
     db = get_db()
@@ -15,14 +18,14 @@ def reservation_get(cabin_id):
         cabin = db.cabin_repository.get(cabin_id)
         current_reservations = db.reservation_repository.get_by_cabin_id(cabin_id)
         return render_template(
-                "reservation.html",
-                cabin = cabin,
-                current_reservations = current_reservations)
+            "reservation.html", cabin=cabin, current_reservations=current_reservations
+        )
 
     except CabinNotFoundError:
         return render_template("404.html"), 404
 
-@reservation_routes.route("/reservations/<int:cabin_id>", methods = ["POST"])
+
+@reservation_routes.route("/reservations/<int:cabin_id>", methods=["POST"])
 @login_required
 def reservation_post(cabin_id):
     db = get_db()
@@ -64,11 +67,9 @@ def reservation_post(cabin_id):
             flash("The selected dates have already been reserved", "error")
             error = True
 
-
     if error:
-        return render_template("reservation.html", cabin = cabin)
+        return render_template("reservation.html", cabin=cabin)
 
     db.reservation_repository.add(start_date, end_date, current_user.id, cabin_id)
 
     return redirect(f"/cabins/{cabin_id}")
-

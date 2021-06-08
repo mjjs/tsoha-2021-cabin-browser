@@ -2,9 +2,10 @@ from flask import Blueprint, render_template, request
 from flask_login import login_required
 from db import get_db
 
-keyword_routes = Blueprint("keyword_routes", __name__, template_folder = "templates")
+keyword_routes = Blueprint("keyword_routes", __name__, template_folder="templates")
 
-@keyword_routes.route("/keywords", methods = ["POST"])
+
+@keyword_routes.route("/keywords", methods=["POST"])
 def keyword_post():
     db = get_db()
 

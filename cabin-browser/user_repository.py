@@ -1,13 +1,16 @@
 from user import User
 from uuid import uuid4
 
+
 class UserNotFoundError(Exception):
     def __init__(self, key, value):
         super().__init__(f"A user with the {key} {value} was not found in the database")
 
+
 class UserExistsError(Exception):
     def __init__(self, email):
         super().__init__(f"User with email {email} already exists in the database")
+
 
 class UserRepository:
     def __init__(self, connection_pool):
@@ -25,19 +28,17 @@ class UserRepository:
             """
 
             cursor.execute(
-                    sql,
-                    (uuid4(), email, name, password_hash.decode("utf-8"), role),
-                    )
+                sql,
+                (uuid4(), email, name, password_hash.decode("utf-8"), role),
+            )
 
             self._connection_pool.commit()
             cursor.close()
 
-
     def get_by_email(self, email):
         cursor = self._connection_pool.cursor()
         cursor.execute(
-                "SELECT id, email, name, role FROM users WHERE email = %s",
-                (email,)
+            "SELECT id, email, name, role FROM users WHERE email = %s", (email,)
         )
         row = cursor.fetchone()
 
@@ -48,8 +49,7 @@ class UserRepository:
 
         cursor.close()
 
-        return User(id = id, email = email, name = name, role = role)
-
+        return User(id=id, email=email, name=name, role=role)
 
     def get_password_hash_by_user_id(self, id):
         cursor = self._connection_pool.cursor()
@@ -67,10 +67,7 @@ class UserRepository:
 
     def get(self, id):
         cursor = self._connection_pool.cursor()
-        cursor.execute(
-                "SELECT id, email, name, role FROM users WHERE id = %s",
-                (id,)
-        )
+        cursor.execute("SELECT id, email, name, role FROM users WHERE id = %s", (id,))
         row = cursor.fetchone()
 
         if not row:
@@ -80,4 +77,4 @@ class UserRepository:
 
         cursor.close()
 
-        return User(id = id, email = email, name = name, role = role)
+        return User(id=id, email=email, name=name, role=role)

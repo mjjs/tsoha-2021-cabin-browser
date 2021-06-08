@@ -6,11 +6,17 @@ from db import get_db
 from cabin_repository import CabinNotFoundError
 from user_repository import UserNotFoundError
 from user import UserRole
-from validators import validate_name, is_empty, is_valid_municipality, is_valid_price_str
+from validators import (
+    validate_name,
+    is_empty,
+    is_valid_municipality,
+    is_valid_price_str,
+)
 
-cabin_routes = Blueprint("cabin_routes", __name__, template_folder = "templates")
+cabin_routes = Blueprint("cabin_routes", __name__, template_folder="templates")
 
-@cabin_routes.route("/cabins", methods = ["GET"])
+
+@cabin_routes.route("/cabins", methods=["GET"])
 def get_all_cabins():
     user_id = request.args.get("owner")
     if user_id:
@@ -33,9 +39,15 @@ def get_all_cabins():
     all_keywords = db.keyword_repository.get_all()
     municipalities = db.municipality_repository.get_all_used()
 
-    return render_template("cabins.html", cabins = cabins, keywords = all_keywords, municipalities = municipalities)
+    return render_template(
+        "cabins.html",
+        cabins=cabins,
+        keywords=all_keywords,
+        municipalities=municipalities,
+    )
 
-@cabin_routes.route("/cabins/<int:id>", methods = ["DELETE"])
+
+@cabin_routes.route("/cabins/<int:id>", methods=["DELETE"])
 @login_required
 def delete_cabin(id):
     db = get_db()
@@ -53,7 +65,8 @@ def delete_cabin(id):
 
     return "OK"
 
-@cabin_routes.route("/cabins/<int:id>", methods = ["GET"])
+
+@cabin_routes.route("/cabins/<int:id>", methods=["GET"])
 def get_cabin(id):
     db = get_db()
 
@@ -77,15 +90,16 @@ def get_cabin(id):
     keywords = db.keyword_repository.get_by_cabin_id(id)
 
     return render_template(
-            "cabin.html",
-            cabin = cabin,
-            owner = owner,
-            reviews = reviews,
-            reservations = reservations,
-            keywords = keywords,
+        "cabin.html",
+        cabin=cabin,
+        owner=owner,
+        reviews=reviews,
+        reservations=reservations,
+        keywords=keywords,
     )
 
-@cabin_routes.route("/newcabin", methods = ["GET"])
+
+@cabin_routes.route("/newcabin", methods=["GET"])
 @login_required
 def new_cabin_page():
     if current_user.role != UserRole.CABIN_OWNER.value:
@@ -96,9 +110,12 @@ def new_cabin_page():
     municipalities = db.municipality_repository.get_all()
     keywords = db.keyword_repository.get_all()
 
-    return render_template("addcabin.html", municipalities = municipalities, keywords = keywords)
+    return render_template(
+        "addcabin.html", municipalities=municipalities, keywords=keywords
+    )
 
-@cabin_routes.route("/newcabin", methods = ["POST"])
+
+@cabin_routes.route("/newcabin", methods=["POST"])
 @login_required
 def create_new_cabin():
     if current_user.role != UserRole.CABIN_OWNER.value:
@@ -121,7 +138,10 @@ def create_new_cabin():
 
     municipality_id = request.form["municipality"]
     if not is_valid_municipality(municipality_id):
-        flash("The selected municipality is not valid. This problem has been logged and will be investigated.", "error")
+        flash(
+            "The selected municipality is not valid. This problem has been logged and will be investigated.",
+            "error",
+        )
         error = True
 
     price = request.form["price"]
@@ -138,7 +158,7 @@ def create_new_cabin():
     images = [img for img in images if img.filename != ""]
 
     for image in images:
-        if what(None, h = image.read()) not in ["jpeg", "png"]:
+        if what(None, h=image.read()) not in ["jpeg", "png"]:
             flash("Only jpeg or png images are supported", "error")
             error = True
             break
@@ -149,7 +169,14 @@ def create_new_cabin():
         return redirect("/newcabin")
 
     # TODO: Do these in a transaction?
-    cabin_id = db.cabin_repository.add(address, float(price) * 1000000, description, municipality_id, name, current_user.id)
+    cabin_id = db.cabin_repository.add(
+        address,
+        float(price) * 1000000,
+        description,
+        municipality_id,
+        name,
+        current_user.id,
+    )
 
     for kw in keywords:
         db.keyword_repository.add_to_cabin(kw, cabin_id)
@@ -162,7 +189,6 @@ def create_new_cabin():
             b64 = b64encode(image.read()).decode()
             default = default_image == image.filename
             db.cabin_image_repository.add(f"{mimetype};base64,{b64}", cabin_id, default)
-
 
     flash("Cabin added.", "success")
     return redirect(f"/cabins/{cabin_id}")

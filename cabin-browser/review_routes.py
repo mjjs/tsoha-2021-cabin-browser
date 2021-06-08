@@ -5,20 +5,22 @@ from cabin_repository import CabinNotFoundError
 from datetime import date
 from user import UserRole
 
-review_routes = Blueprint("review_routes", __name__, template_folder = "templates")
+review_routes = Blueprint("review_routes", __name__, template_folder="templates")
 
-@review_routes.route("/cabins/<int:id>/review", methods = ["GET"])
+
+@review_routes.route("/cabins/<int:id>/review", methods=["GET"])
 @login_required
 def review_get(id):
     db = get_db()
 
     try:
         cabin = db.cabin_repository.get(id)
-        return render_template("review.html", cabin = cabin)
+        return render_template("review.html", cabin=cabin)
     except CabinNotFoundError:
         return render_template("404.html")
 
-@review_routes.route("/cabins/<int:id>/review", methods = ["POST"])
+
+@review_routes.route("/cabins/<int:id>/review", methods=["POST"])
 @login_required
 def review_post(id):
     db = get_db()
@@ -27,17 +29,20 @@ def review_post(id):
     content = request.form["content"]
 
     db.review_repository.add(
-            rating = rating,
-            content = content,
-            user_id = current_user.id,
-            cabin_id = id,
+        rating=rating,
+        content=content,
+        user_id=current_user.id,
+        cabin_id=id,
     )
 
     flash("Review added.", "success")
 
     return redirect(f"/cabins/{id}")
 
-@review_routes.route("/cabins/<int:cabin_id>/review/<int:review_id>", methods = ["DELETE"])
+
+@review_routes.route(
+    "/cabins/<int:cabin_id>/review/<int:review_id>", methods=["DELETE"]
+)
 @login_required
 def review_delete(cabin_id, review_id):
     db = get_db()

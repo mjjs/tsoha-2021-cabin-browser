@@ -26,7 +26,10 @@ class CabinImageRepository:
 
     def get_default_cabin_image(self, cabin_id):
         cursor = self._connection_pool.cursor()
-        cursor.execute("SELECT data FROM cabin_images WHERE cabin_id = %s AND is_default = true", (cabin_id,))
+        cursor.execute(
+            "SELECT data FROM cabin_images WHERE cabin_id = %s AND is_default = true",
+            (cabin_id,),
+        )
         row = cursor.fetchone()
         cursor.close()
         return row[0] if row else "not_found.png"
