@@ -10,18 +10,14 @@ from config import (
 )
 from db import get_db
 
-from login_routes import login_routes
-from logout_routes import logout_routes
-from register_routes import register_routes
+from authentication_routes import authentication_routes
 from cabin_routes import cabin_routes
 from keyword_routes import keyword_routes
 from reservation_routes import reservation_routes
 from review_routes import review_routes
 
 app = Flask(__name__)
-app.register_blueprint(login_routes)
-app.register_blueprint(logout_routes)
-app.register_blueprint(register_routes)
+app.register_blueprint(authentication_routes)
 app.register_blueprint(cabin_routes)
 app.register_blueprint(keyword_routes)
 app.register_blueprint(reservation_routes)
