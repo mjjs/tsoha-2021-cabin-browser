@@ -1,5 +1,7 @@
 # tsoha-2021-cabin-browser
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 The application is a summer cabin browser for Finland. A cabin owner can list their
 summer cabin into the site and regular users can browse, rate, and book these cabins
 for the summer.
