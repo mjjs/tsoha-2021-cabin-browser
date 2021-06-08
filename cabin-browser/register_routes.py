@@ -4,6 +4,7 @@ from db import get_db
 from bcrypt import hashpw, gensalt
 from user_repository import UserExistsError
 from re import match
+from validators import validate_name, validate_email, passwords_match, validate_password_complexity, validate_role
 
 register_routes = Blueprint("register_routes", __name__, template_folder = "templates")
 
@@ -33,7 +34,7 @@ def register_user():
     password = request.form["password"]
     confirm_password = request.form["confirm_password"]
 
-    if not validate_passwords(password, confirm_password):
+    if not passwords_match(password, confirm_password):
         flash("Passwords did not match.", "error")
         error = True
 
@@ -60,19 +61,3 @@ def register_user():
 
     flash("Register successful. You can now log in.", "success")
     return redirect("/login")
-
-def validate_name(name):
-    return name != ""
-
-def validate_email(email):
-    return match(r".+@.+\..+", email) is not None
-
-def validate_passwords(password, confirm_password):
-    return password == confirm_password
-
-def validate_role(role):
-    return role in ("CUSTOMER", "OWNER")
-
-def validate_password_complexity(password):
-    # TODO: implement this
-    return True

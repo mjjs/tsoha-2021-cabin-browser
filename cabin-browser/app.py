@@ -1,10 +1,8 @@
 from flask import Flask, g, redirect, render_template
 from flask_login import LoginManager
-from uuid import uuid4
-from user import User, UserRole
+from werkzeug.exceptions import RequestEntityTooLarge
 from config import FLASK_SECRET_KEY, UPLOAD_FOLDER, ENVIRONMENT, PORT, MAX_CONTENT_LENGTH
 from db import get_db
-from werkzeug.exceptions import RequestEntityTooLarge
 
 from login_routes import login_routes
 from logout_routes import logout_routes
