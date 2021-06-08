@@ -3,6 +3,7 @@ from cabin import Cabin
 from municipality_repository import Municipality
 from user import User
 
+
 class CabinExistsError(Exception):
     def __init__(self, address):
         super().__init__(f"Cabin with address {address} already exists in the database")
