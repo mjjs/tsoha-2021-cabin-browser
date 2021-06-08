@@ -1,5 +1,4 @@
 from base64 import b64encode
-from imghdr import what
 from flask import Blueprint, render_template, request, redirect, flash
 from flask_login import login_required, current_user
 from db import get_db
@@ -11,6 +10,7 @@ from validators import (
     is_empty,
     is_valid_municipality,
     is_valid_price_str,
+    is_valid_image,
 )
 
 cabin_routes = Blueprint("cabin_routes", __name__, template_folder="templates")
@@ -158,12 +158,10 @@ def create_new_cabin():
     images = [img for img in images if img.filename != ""]
 
     for image in images:
-        if what(None, h=image.read()) not in ["jpeg", "png"]:
+        if not is_valid_image(image):
             flash("Only jpeg or png images are supported", "error")
             error = True
             break
-
-        image.seek(0)
 
     if error:
         return redirect("/newcabin")
