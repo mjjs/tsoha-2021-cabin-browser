@@ -35,7 +35,9 @@ class CabinRepository(Repository):
     def add(self, address, price, description, municipality_id, name, owner_id):
         try:
             return Repository._add(
-                self, [name, address, price, description, municipality_id, owner_id]
+                self=self,
+                values=[name, address, price, description, municipality_id, owner_id],
+                returned_field="id",
             )
         except IntegrityError:
             raise CabinExistsError(address)
