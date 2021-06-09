@@ -68,7 +68,7 @@ def reservation_post(cabin_id):
             error = True
 
     if error:
-        return render_template("reservation.html", cabin=cabin)
+        return redirect(f"/reservations/{cabin_id}")
 
     reservation_repository.add(start_date, end_date, current_user.id, cabin_id)
 
