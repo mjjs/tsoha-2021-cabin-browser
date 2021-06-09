@@ -32,12 +32,23 @@ class Repository:
 
         return rows
 
-    def _add(self, values):
+    def _add(self, values, returned_field=None):
+        ret_field = self._id_field if not returned_field else returned_field
         cursor = self._connection_pool.cursor()
         fields = ",".join(self._insertable_fields)
         placeholders = (len(values) * "%s, ")[:-2]
 
-        sql = f"INSERT INTO {self._table_name} ({fields}) VALUES ({placeholders})"
+        sql = f"INSERT INTO {self._table_name} ({fields}) VALUES ({placeholders}) RETURNING {ret_field}"
         cursor.execute(sql, tuple(values))
 
+        retval = cursor.fetchone()[0]
+
+        cursor.close()
+
+        return retval
+
+    def _delete(self, id):
+        cursor = self._connection_pool.cursor()
+        sql = f"DELETE FROM {self._table_name} WHERE {self._id_field} = %s"
+        cursor.execute(sql, (id,))
         cursor.close()
