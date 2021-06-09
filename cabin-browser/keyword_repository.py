@@ -1,4 +1,5 @@
 from psycopg2 import IntegrityError
+from repository import Repository
 
 
 class Keyword:
@@ -12,37 +13,24 @@ class KeywordExistsError(Exception):
         super().__init__(f"The keyword {keyword} already exists in the database")
 
 
-class KeywordRepository:
+class KeywordRepository(Repository):
     def __init__(self, connection_pool):
-        self._connection_pool = connection_pool
+        Repository.__init__(
+            self=self,
+            connection_pool=connection_pool,
+            fields=["id", "keyword"],
+            insertable_fields=["keyword"],
+            table_name="keywords",
+        )
 
     def add(self, keyword):
         try:
-            cursor = self._connection_pool.cursor()
-            sql = "INSERT INTO keywords(keyword) VALUES (%s) RETURNING id"
-            cursor.execute(sql, (keyword,))
-            self._connection_pool.commit()
-
-            row = cursor.fetchone()
-            cursor.close()
-
-            return row[0]
+            return Repository._add(self=self, values=[keyword], returned_field="id")
         except IntegrityError:
             raise KeywordExistsError(keyword)
 
-    def add_to_cabin(self, keyword_id, cabin_id):
-        cursor = self._connection_pool.cursor()
-        sql = "INSERT INTO cabins_keywords(keyword_id, cabin_id) VALUES (%s, %s)"
-        cursor.execute(sql, (keyword_id, cabin_id))
-        self._connection_pool.commit()
-        cursor.close()
-
     def get_all(self):
-        cursor = self._connection_pool.cursor()
-        sql = "SELECT id, keyword FROM keywords"
-        cursor.execute(sql)
-        rows = cursor.fetchall()
-
+        rows = Repository._get_all(self)
         return [Keyword(id, keyword) for (id, keyword) in rows]
 
     def get_by_cabin_id(self, cabin_id):
@@ -56,3 +44,9 @@ class KeywordRepository:
         rows = cursor.fetchall()
 
         return [Keyword(id, keyword) for (id, keyword) in rows]
+
+    def add_to_cabin(self, keyword_id, cabin_id):
+        cursor = self._connection_pool.cursor()
+        sql = "INSERT INTO cabins_keywords(keyword_id, cabin_id) VALUES (%s, %s)"
+        cursor.execute(sql, (keyword_id, cabin_id))
+        cursor.close()
