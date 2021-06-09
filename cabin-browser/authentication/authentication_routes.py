@@ -1,10 +1,8 @@
-from re import match
 from urllib.parse import urlparse, urljoin
 from flask import Blueprint, redirect, flash, request, render_template
-from flask_login import logout_user, login_required, login_user, current_user
-from bcrypt import checkpw, hashpw, gensalt
+from flask_login import login_required, current_user
 from db import connection_pool
-from user_repository import UserNotFoundError, UserExistsError, UserRepository
+from user_repository import UserRepository
 from validators import (
     validate_name,
     validate_email,
@@ -13,13 +11,15 @@ from validators import (
     validate_role,
 )
 
+from .authentication_service import AuthenticationService
+
 authentication_routes = Blueprint(
     "authentication_routes", __name__, template_folder="templates"
 )
 
 INCORRECT_USER_OR_PW_MSG = "Incorrect username or password"
 
-user_repository = UserRepository(connection_pool)
+authentication_service = AuthenticationService(UserRepository(connection_pool))
 
 @authentication_routes.route("/login", methods=["GET"])
 def login_get():
@@ -39,22 +39,17 @@ def login_post():
     email = request.form["email"]
     password = request.form["password"]
 
-    try:
-        user = user_repository.get_by_email(email)
-    except UserNotFoundError:
+    user = authentication_service.get_user_by_email(email)
+    if not user:
         flash(INCORRECT_USER_OR_PW_MSG, "error")
-        return render_template("login.html")
+        return redirect("/login")
 
-    hashed_password = user_repository.get_password_hash_by_user_id(user.id)
-
-    if not checkpw(password.encode("utf-8"), hashed_password.encode("utf-8")):
+    if not authentication_service.check_user_password(user.id, password):
         flash(INCORRECT_USER_OR_PW_MSG, "error")
-        return render_template("login.html")
+        return redirect("/login")
 
-    login_user(user)
-
+    authentication_service.log_user_in(user)
     next_page = request.args.get("next")
-
     flash("Login successful", "success")
 
     if not is_safe_url(next_page):
@@ -102,15 +97,11 @@ def register_user():
         error = True
 
     if error:
-        return render_template("register.html")
+        return redirect("/register")
 
-    hashed_password = hashpw(password.encode("utf-8"), gensalt())
-
-    try:
-        user_repository.add(email, name, hashed_password, role)
-    except UserExistsError:
+    if not authentication_service.add_user(email, name, password, role):
         flash("A user already exists with the given email.", "error")
-        return render_template("register.html")
+        return redirect("/register")
 
     flash("Register successful. You can now log in.", "success")
     return redirect("/login")
@@ -119,10 +110,8 @@ def register_user():
 @authentication_routes.route("/logout", methods=["GET"])
 @login_required
 def logout_get():
-    logout_user()
-
+    authentication_service.log_user_out()
     flash("Logged out successfully.", "success")
-
     return redirect("/")
 
 
