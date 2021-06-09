@@ -12,50 +12,48 @@ class Repository:
         return self._get_by_field(self._id_field, id)
 
     def _get_by_field(self, field, value):
-        cursor = self._connection_pool.cursor()
-        fields = ",".join(self._fields)
-        sql = f"SELECT {fields} FROM {self._table_name} WHERE {field} = %s"
-        cursor.execute(sql, (value,))
-        row = cursor.fetchone()
-        cursor.close()
+        with self._connection_pool.cursor() as cursor:
+            fields = ",".join(self._fields)
+            sql = f"SELECT {fields} FROM {self._table_name} WHERE {field} = %s"
+            cursor.execute(sql, (value,))
+            row = cursor.fetchone()
 
-        return row
+            return row
 
     def _get_all(self, where_field=None, where_value=None):
         if (where_field and not where_value) or (where_value and not where_field):
             raise ValueError("where_field and where_value both need to be set or None")
 
-        cursor = self._connection_pool.cursor()
-        fields = ",".join(self._fields)
-        sql = f"SELECT {fields} FROM {self._table_name}"
-        if where_field:
-            sql += f" WHERE {where_field} = %s"
-            cursor.execute(sql, (where_value,))
-        else:
-            cursor.execute(sql)
+        with self._connection_pool.cursor() as cursor:
+            fields = ",".join(self._fields)
+            sql = f"SELECT {fields} FROM {self._table_name}"
+            if where_field:
+                sql += f" WHERE {where_field} = %s"
+                cursor.execute(sql, (where_value,))
+            else:
+                cursor.execute(sql)
 
-        rows = cursor.fetchall()
-        cursor.close()
+            rows = cursor.fetchall()
 
-        return rows
+            return rows
 
     def _add(self, values, returned_field=None):
-        ret_field = self._id_field if not returned_field else returned_field
-        cursor = self._connection_pool.cursor()
-        fields = ",".join(self._insertable_fields)
-        placeholders = (len(values) * "%s, ")[:-2]
+        with self._connection_pool.cursor() as cursor:
+            fields = ",".join(self._insertable_fields)
+            placeholders = (len(values) * "%s, ")[:-2]
 
-        sql = f"INSERT INTO {self._table_name} ({fields}) VALUES ({placeholders}) RETURNING {ret_field}"
-        cursor.execute(sql, tuple(values))
+            sql = f"""
+                INSERT INTO {self._table_name} ({fields})
+                VALUES ({placeholders})
+            """
+            if returned_field:
+                sql += f" RETURNING {returned_field}"
 
-        retval = cursor.fetchone()[0]
+            cursor.execute(sql, tuple(values))
 
-        cursor.close()
-
-        return retval
+            return cursor.fetchone()[0]
 
     def _delete(self, id):
-        cursor = self._connection_pool.cursor()
-        sql = f"DELETE FROM {self._table_name} WHERE {self._id_field} = %s"
-        cursor.execute(sql, (id,))
-        cursor.close()
+        with self._connection_pool.cursor() as cursor:
+            sql = f"DELETE FROM {self._table_name} WHERE {self._id_field} = %s"
+            cursor.execute(sql, (id,))
