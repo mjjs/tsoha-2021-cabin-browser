@@ -1,3 +1,6 @@
+from repository import Repository
+
+
 class Review:
     def __init__(self, id, content, rating, user_id, cabin_id):
         self.id = id
@@ -12,33 +15,22 @@ class ReviewNotFoundError(Exception):
         super().__init__(f"Review with id {id} not found in the database")
 
 
-class ReviewRepository:
+class ReviewRepository(Repository):
     def __init__(self, connection_pool):
-        self._connection_pool = connection_pool
+        fields = ["id", "content", "rating", "user_id", "cabin_id"]
+        Repository.__init__(
+            self=self,
+            connection_pool=connection_pool,
+            fields=fields,
+            insertable_fields=fields[1:],
+            table_name="reviews",
+        )
 
     def add(self, content, rating, user_id, cabin_id):
-        cursor = self._connection_pool.cursor()
-        sql = """
-            INSERT INTO reviews(content, rating, user_id, cabin_id)
-            VALUES (%s, %s, %s, %s)
-            """
-
-        cursor.execute(sql, (content, rating, user_id, cabin_id))
-        self._connection_pool.commit()
-
-        cursor.close()
+        Repository._add(self, [content, rating, user_id, cabin_id])
 
     def get(self, id):
-        cursor = self._connection_pool.cursor()
-        sql = """
-            SELECT id, content, rating, user_id, cabin_id
-            FROM reviews
-            WHERE id = %s
-            """
-
-        cursor.execute(sql, (id,))
-        row = cursor.fetchone()
-
+        row = Repository._get(self, id)
         if not row:
             raise ReviewNotFoundError(id)
 
@@ -46,29 +38,13 @@ class ReviewRepository:
         return Review(id, content, rating, user_id, cabin_id)
 
     def get_by_cabin_id(self, id):
-        cursor = self._connection_pool.cursor()
-        sql = """
-            SELECT id, content, rating, user_id, cabin_id
-            FROM reviews
-            WHERE cabin_id = %s
-            """
-
-        cursor.execute(sql, (id,))
-        rows = cursor.fetchall()
-
-        reviews = []
-        for (id, content, rating, user_id, cabin_id) in rows:
-            reviews.append(Review(id, content, rating, user_id, cabin_id))
-
-        cursor.close()
+        rows = Repository._get_all(self=self, where_field="cabin_id", where_value=id)
+        reviews = [
+            Review(id, content, rating, user_id, cabin_id)
+            for (id, content, rating, user_id, cabin_id) in rows
+        ]
 
         return reviews
 
     def delete_review(self, id):
-        cursor = self._connection_pool.cursor()
-
-        sql = "DELETE FROM reviews WHERE id = %s"
-        cursor.execute(sql, (id,))
-
-        self._connection_pool.commit()
-        cursor.close()
+        Repository._delete(self, id)
