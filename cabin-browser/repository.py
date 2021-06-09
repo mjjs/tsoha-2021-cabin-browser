@@ -1,5 +1,7 @@
 class Repository:
-    def __init__(self, connection_pool, fields, insertable_fields, table_name, id_field = "id"):
+    def __init__(
+        self, connection_pool, fields, insertable_fields, table_name, id_field="id"
+    ):
         self._connection_pool = connection_pool
         self._fields = fields
         self._insertable_fields = insertable_fields
