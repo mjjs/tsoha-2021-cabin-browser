@@ -1,7 +1,6 @@
 from psycopg2 import IntegrityError
 from cabin import Cabin
-from municipality_repository import Municipality
-from user import User
+from repository import Repository
 
 
 class CabinExistsError(Exception):
@@ -14,39 +13,35 @@ class CabinNotFoundError(Exception):
         super().__init__(f"Cabin with id {id} not found in the database")
 
 
-class CabinRepository:
+class CabinRepository(Repository):
     def __init__(self, connection_pool):
-        self._connection_pool = connection_pool
+        fields = [
+            "id",
+            "name",
+            "address",
+            "price",
+            "description",
+            "municipality_id",
+            "owner_id",
+        ]
+        Repository.__init__(
+            self=self,
+            connection_pool=connection_pool,
+            fields=fields,
+            insertable_fields=fields[1:],
+            table_name="cabins",
+        )
 
     def add(self, address, price, description, municipality_id, name, owner_id):
-        cursor = self._connection_pool.cursor()
-
-        sql = """
-            INSERT INTO cabins
-            (address, price, description, municipality_id, name, owner_id)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            RETURNING id
-        """
-
         try:
-            cursor.execute(
-                sql,
-                (address, price, description, municipality_id, name, owner_id),
+            return Repository._add(
+                self, [name, address, price, description, municipality_id, owner_id]
             )
-            self._connection_pool.commit()
-            id = cursor.fetchone()[0]
-            return id
         except IntegrityError:
             raise CabinExistsError(address)
-        finally:
-            cursor.close()
 
     def delete(self, id):
-        cursor = self._connection_pool.cursor()
-
-        cursor.execute("DELETE FROM cabins WHERE id = %s", (id,))
-        self._connection_pool.commit()
-        cursor.close()
+        Repository._delete(self, id)
 
     def get_all(self):
         cursor = self._connection_pool.cursor()
