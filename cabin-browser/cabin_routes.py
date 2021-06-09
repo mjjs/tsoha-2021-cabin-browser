@@ -1,9 +1,14 @@
 from base64 import b64encode
 from flask import Blueprint, render_template, request, redirect, flash
 from flask_login import login_required, current_user
-from db import get_db
-from cabin_repository import CabinNotFoundError
-from user_repository import UserNotFoundError
+from db import connection_pool
+from cabin_repository import CabinNotFoundError, CabinRepository
+from user_repository import UserNotFoundError, UserRepository
+from cabin_image_repository import CabinImageRepository
+from reservation_repository import ReservationRepository
+from keyword_repository import KeywordRepository
+from review_repository import ReviewRepository
+from municipality_repository import MunicipalityRepository
 from user import UserRole
 from validators import (
     validate_name,
@@ -15,6 +20,14 @@ from validators import (
 
 cabin_routes = Blueprint("cabin_routes", __name__, template_folder="templates")
 
+cabin_repository = CabinRepository(connection_pool)
+cabin_image_repository = CabinImageRepository(connection_pool)
+keyword_repository = KeywordRepository(connection_pool)
+municipality_repository = MunicipalityRepository(connection_pool)
+reservation_repository = ReservationRepository(connection_pool)
+review_repository = ReviewRepository(connection_pool)
+user_repository = UserRepository(connection_pool)
+
 
 @cabin_routes.route("/cabins", methods=["GET"])
 def get_all_cabins():
@@ -23,21 +36,19 @@ def get_all_cabins():
         if current_user.role == UserRole.CUSTOMER.value:
             return redirect("/cabins")
 
-    db = get_db()
-
     cabins = []
     if user_id:
-        cabins = db.cabin_repository.get_all_by_owner_id(user_id)
+        cabins = cabin_repository.get_all_by_owner_id(user_id)
     else:
-        cabins = db.cabin_repository.get_all()
+        cabins = cabin_repository.get_all()
 
     for cabin in cabins:
-        cabin.images = [db.cabin_image_repository.get_default_cabin_image(cabin.id)]
-        cabin.reservations = db.reservation_repository.get_by_cabin_id(cabin.id)
-        cabin.keywords = db.keyword_repository.get_by_cabin_id(cabin.id)
+        cabin.images = [cabin_image_repository.get_default_cabin_image(cabin.id)]
+        cabin.reservations = reservation_repository.get_by_cabin_id(cabin.id)
+        cabin.keywords = keyword_repository.get_by_cabin_id(cabin.id)
 
-    all_keywords = db.keyword_repository.get_all()
-    municipalities = db.municipality_repository.get_all_used()
+    all_keywords = keyword_repository.get_all()
+    municipalities = municipality_repository.get_all_used()
 
     return render_template(
         "cabins.html",
@@ -50,44 +61,40 @@ def get_all_cabins():
 @cabin_routes.route("/cabins/<int:id>", methods=["DELETE"])
 @login_required
 def delete_cabin(id):
-    db = get_db()
-
     if current_user.role == UserRole.CUSTOMER.value:
         return "NOT OK", 403
 
-    cabin = db.cabin_repository.get(id)
+    cabin = cabin_repository.get(id)
 
     if current_user.role == UserRole.CABIN_OWNER.value:
         if cabin.owner_id != current_user.id:
             return "NOT OK", 403
 
-    db.cabin_repository.delete(id)
+    cabin_repository.delete(id)
 
     return "OK"
 
 
 @cabin_routes.route("/cabins/<int:id>", methods=["GET"])
 def get_cabin(id):
-    db = get_db()
-
     cabin = None
 
     try:
-        cabin = db.cabin_repository.get(id)
+        cabin = cabin_repository.get(id)
     except CabinNotFoundError:
         return render_template("404.html")
 
     owner = None
 
     try:
-        owner = db.user_repository.get(cabin.owner_id)
+        owner = user_repository.get(cabin.owner_id)
     except UserNotFoundError:
         return render_template("500.html")
 
-    reviews = db.review_repository.get_by_cabin_id(id)
-    cabin.images = db.cabin_image_repository.get_by_cabin_id(id)
-    reservations = db.reservation_repository.get_by_cabin_id(id)
-    keywords = db.keyword_repository.get_by_cabin_id(id)
+    reviews = review_repository.get_by_cabin_id(id)
+    cabin.images = cabin_image_repository.get_by_cabin_id(id)
+    reservations = reservation_repository.get_by_cabin_id(id)
+    keywords = keyword_repository.get_by_cabin_id(id)
 
     return render_template(
         "cabin.html",
@@ -106,9 +113,8 @@ def new_cabin_page():
         flash("Only cabin owners can add new cabins", "error")
         return render_template("cabins.html"), 403
 
-    db = get_db()
-    municipalities = db.municipality_repository.get_all()
-    keywords = db.keyword_repository.get_all()
+    municipalities = municipality_repository.get_all()
+    keywords = keyword_repository.get_all()
 
     return render_template(
         "addcabin.html", municipalities=municipalities, keywords=keywords
@@ -121,8 +127,6 @@ def create_new_cabin():
     if current_user.role != UserRole.CABIN_OWNER.value:
         flash("Only cabin owners can add new cabins", "error")
         return render_template("cabins.html"), 403
-
-    db = get_db()
 
     error = False
 
@@ -167,7 +171,7 @@ def create_new_cabin():
         return redirect("/newcabin")
 
     # TODO: Do these in a transaction?
-    cabin_id = db.cabin_repository.add(
+    cabin_id = cabin_repository.add(
         address,
         float(price) * 1000000,
         description,
@@ -177,7 +181,7 @@ def create_new_cabin():
     )
 
     for kw in keywords:
-        db.keyword_repository.add_to_cabin(kw, cabin_id)
+        keyword_repository.add_to_cabin(kw, cabin_id)
 
     if "default_image" in request.form:
         default_image = request.form["default_image"]
@@ -186,7 +190,7 @@ def create_new_cabin():
             mimetype = image.mimetype
             b64 = b64encode(image.read()).decode()
             default = default_image == image.filename
-            db.cabin_image_repository.add(f"{mimetype};base64,{b64}", cabin_id, default)
+            cabin_image_repository.add(f"{mimetype};base64,{b64}", cabin_id, default)
 
     flash("Cabin added.", "success")
     return redirect(f"/cabins/{cabin_id}")

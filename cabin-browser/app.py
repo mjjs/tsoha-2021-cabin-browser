@@ -8,7 +8,8 @@ from config import (
     PORT,
     MAX_CONTENT_LENGTH,
 )
-from db import get_db
+from user_repository import UserRepository
+from db import connection_pool
 
 from authentication_routes import authentication_routes
 from cabin_routes import cabin_routes
@@ -31,13 +32,6 @@ login_manager.login_view = "login_routes.login_get"
 login_manager.init_app(app)
 
 
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, "_database", None)
-    if db:
-        db.close()
-
-
 @app.errorhandler(413)
 @app.errorhandler(RequestEntityTooLarge)
 def handle_too_large_files(e):
@@ -46,9 +40,7 @@ def handle_too_large_files(e):
 
 @login_manager.user_loader
 def load_user(user_id):
-    with app.app_context():
-        db = get_db()
-        return db.user_repository.get(user_id)
+    return UserRepository(connection_pool).get(user_id)
 
 
 @app.route("/", methods=["GET"])

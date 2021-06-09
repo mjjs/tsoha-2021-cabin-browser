@@ -1,6 +1,7 @@
 from re import match
-from db import get_db
 from imghdr import what
+from db import connection_pool
+from municipality_repository import MunicipalityRepository
 
 
 def validate_name(name):
@@ -32,8 +33,7 @@ def is_valid_municipality(municipality_id):
     if not municipality_id.isnumeric():
         return False
 
-    db = get_db()
-    for municipality in db.municipality_repository.get_all():
+    for municipality in MunicipalityRepository(connection_pool).get_all():
         if municipality.id == int(municipality_id):
             return True
 

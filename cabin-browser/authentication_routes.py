@@ -3,8 +3,8 @@ from urllib.parse import urlparse, urljoin
 from flask import Blueprint, redirect, flash, request, render_template
 from flask_login import logout_user, login_required, login_user, current_user
 from bcrypt import checkpw, hashpw, gensalt
-from db import get_db
-from user_repository import UserNotFoundError, UserExistsError
+from db import connection_pool
+from user_repository import UserNotFoundError, UserExistsError, UserRepository
 from validators import (
     validate_name,
     validate_email,
@@ -16,8 +16,10 @@ from validators import (
 authentication_routes = Blueprint(
     "authentication_routes", __name__, template_folder="templates"
 )
+
 INCORRECT_USER_OR_PW_MSG = "Incorrect username or password"
 
+user_repository = UserRepository(connection_pool)
 
 @authentication_routes.route("/login", methods=["GET"])
 def login_get():
@@ -34,18 +36,16 @@ def login_get():
 
 @authentication_routes.route("/login", methods=["POST"])
 def login_post():
-    db = get_db()
-
     email = request.form["email"]
     password = request.form["password"]
 
     try:
-        user = db.user_repository.get_by_email(email)
+        user = user_repository.get_by_email(email)
     except UserNotFoundError:
         flash(INCORRECT_USER_OR_PW_MSG, "error")
         return render_template("login.html")
 
-    hashed_password = db.user_repository.get_password_hash_by_user_id(user.id)
+    hashed_password = user_repository.get_password_hash_by_user_id(user.id)
 
     if not checkpw(password.encode("utf-8"), hashed_password.encode("utf-8")):
         flash(INCORRECT_USER_OR_PW_MSG, "error")
@@ -73,8 +73,6 @@ def render_register_page():
 
 @authentication_routes.route("/register", methods=["POST"])
 def register_user():
-    db = get_db()
-
     error = False
 
     name = request.form["name"]
@@ -109,7 +107,7 @@ def register_user():
     hashed_password = hashpw(password.encode("utf-8"), gensalt())
 
     try:
-        db.user_repository.add(email, name, hashed_password, role)
+        user_repository.add(email, name, hashed_password, role)
     except UserExistsError:
         flash("A user already exists with the given email.", "error")
         return render_template("register.html")

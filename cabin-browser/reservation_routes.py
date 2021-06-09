@@ -1,22 +1,24 @@
+from datetime import date
 from flask import Blueprint, render_template, request, redirect, flash
 from flask_login import login_required, current_user
-from db import get_db
-from cabin_repository import CabinNotFoundError
-from datetime import date
+from db import connection_pool
+from cabin_repository import CabinNotFoundError, CabinRepository
+from reservation_repository import ReservationRepository
 
 reservation_routes = Blueprint(
     "reservation_routes", __name__, template_folder="templates"
 )
 
+cabin_repository = CabinRepository(connection_pool)
+reservation_repository = ReservationRepository(connection_pool)
+
 
 @reservation_routes.route("/reservations/<int:cabin_id>", methods=["GET"])
 @login_required
 def reservation_get(cabin_id):
-    db = get_db()
-
     try:
-        cabin = db.cabin_repository.get(cabin_id)
-        current_reservations = db.reservation_repository.get_by_cabin_id(cabin_id)
+        cabin = cabin_repository.get(cabin_id)
+        current_reservations = reservation_repository.get_by_cabin_id(cabin_id)
         return render_template(
             "reservation.html", cabin=cabin, current_reservations=current_reservations
         )
@@ -28,15 +30,13 @@ def reservation_get(cabin_id):
 @reservation_routes.route("/reservations/<int:cabin_id>", methods=["POST"])
 @login_required
 def reservation_post(cabin_id):
-    db = get_db()
-
     cabin = None
     try:
-        cabin = db.cabin_repository.get(cabin_id)
+        cabin = cabin_repository.get(cabin_id)
     except CabinNotFoundError:
         return render_template("404.html"), 404
 
-    current_reservations = db.reservation_repository.get_by_cabin_id(cabin_id)
+    current_reservations = reservation_repository.get_by_cabin_id(cabin_id)
 
     start_date = date.fromisoformat(request.form["start_date"])
     end_date = date.fromisoformat(request.form["end_date"])
@@ -70,6 +70,6 @@ def reservation_post(cabin_id):
     if error:
         return render_template("reservation.html", cabin=cabin)
 
-    db.reservation_repository.add(start_date, end_date, current_user.id, cabin_id)
+    reservation_repository.add(start_date, end_date, current_user.id, cabin_id)
 
     return redirect(f"/cabins/{cabin_id}")
