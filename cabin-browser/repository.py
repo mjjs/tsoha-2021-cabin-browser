@@ -29,7 +29,7 @@ class Repository:
         fields = ",".join(self._fields)
         sql = f"SELECT {fields} FROM {self._table_name}"
         if where_field:
-            sql + f" WHERE {where_field} = %s"
+            sql += f" WHERE {where_field} = %s"
             cursor.execute(sql, (where_value,))
         else:
             cursor.execute(sql)
