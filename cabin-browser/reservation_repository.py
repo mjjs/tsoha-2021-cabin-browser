@@ -1,3 +1,5 @@
+from repository import Repository
+
 class Reservation:
     def __init__(self, id, start, end, user_id, cabin_id):
         self.id = id
@@ -7,19 +9,18 @@ class Reservation:
         self.cabin_id = cabin_id
 
 
-class ReservationRepository:
+class ReservationRepository(Repository):
     def __init__(self, connection_pool):
-        self._connection_pool = connection_pool
+        fields = ["id", "start_date", "end_date", "user_id", "cabin_id"]
+        Repository.__init__(
+                self=self,
+                connection_pool=connection_pool,
+                fields=fields,
+                insertable_fields=fields[1:],
+                table_name="reservations",)
 
     def add(self, start, end, user_id, cabin_id):
-        cursor = self._connection_pool.cursor()
-        sql = """
-            INSERT INTO reservations(start_date, end_date, user_id, cabin_id)
-            VALUES (%s, %s, %s, %s)
-        """
-        cursor.execute(sql, (start, end, user_id, cabin_id))
-        self._connection_pool.commit()
-        cursor.close()
+        Repository._add(self=self, values=[start, end, user_id, cabin_id])
 
     def get_by_cabin_id(self, cabin_id):
         cursor = self._connection_pool.cursor()
