@@ -51,7 +51,8 @@ class Repository:
 
             cursor.execute(sql, tuple(values))
 
-            return cursor.fetchone()[0]
+            if returned_field:
+                return cursor.fetchone()[0]
 
     def _delete(self, id):
         with self._connection_pool.cursor() as cursor:
