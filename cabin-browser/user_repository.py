@@ -26,10 +26,11 @@ class UserRepository(Repository):
 
     def get(self, id):
         row = Repository._get(self, id)
-        (id, email, name, _, role) = row
 
         if not row:
             raise UserNotFoundError("ID", id)
+
+        (id, email, name, _, role) = row
 
         return User(id=id, email=email, name=name, role=role)
 
@@ -44,18 +45,20 @@ class UserRepository(Repository):
 
     def get_by_email(self, email):
         row = Repository._get_by_field(self, "email", email)
-        (id, email, name, _, role) = row
 
         if not row:
             raise UserNotFoundError("email", email)
+
+        (id, email, name, _, role) = row
 
         return User(id=id, email=email, name=name, role=role)
 
     def get_password_hash_by_user_id(self, id):
         row = Repository._get(self, id)
-        (_, _, _, password_hash, _) = row
 
         if not row:
             raise UserNotFoundError("ID", id)
+
+        (_, _, _, password_hash, _) = row
 
         return password_hash
