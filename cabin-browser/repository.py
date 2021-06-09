@@ -21,11 +21,18 @@ class Repository:
 
         return row
 
-    def _get_all(self):
+    def _get_all(self, where_field=None, where_value=None):
+        if (where_field and not where_value) or (where_value and not where_field):
+            raise ValueError("where_field and where_value both need to be set or None")
+
         cursor = self._connection_pool.cursor()
         fields = ",".join(self._fields)
         sql = f"SELECT {fields} FROM {self._table_name}"
-        cursor.execute(sql)
+        if where_field:
+            sql + f" WHERE {where_field} = %s"
+            cursor.execute(sql, (where_value,))
+        else:
+            cursor.execute(sql)
 
         rows = cursor.fetchall()
         cursor.close()
