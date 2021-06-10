@@ -14,7 +14,7 @@ from db import connection_pool
 from authentication import authentication_routes
 from cabin_routes import cabin_routes
 from keyword_routes import keyword_routes
-from reservation_routes import reservation_routes
+from reservation import reservation_routes
 from review import review_routes
 
 app = Flask(__name__)

@@ -1,5 +1,6 @@
 from repository import Repository
 
+
 class Reservation:
     def __init__(self, id, start, end, user_id, cabin_id):
         self.id = id
@@ -13,11 +14,12 @@ class ReservationRepository(Repository):
     def __init__(self, connection_pool):
         fields = ["id", "start_date", "end_date", "user_id", "cabin_id"]
         Repository.__init__(
-                self=self,
-                connection_pool=connection_pool,
-                fields=fields,
-                insertable_fields=fields[1:],
-                table_name="reservations",)
+            self=self,
+            connection_pool=connection_pool,
+            fields=fields,
+            insertable_fields=fields[1:],
+            table_name="reservations",
+        )
 
     def add(self, start, end, user_id, cabin_id):
         Repository._add(self=self, values=[start, end, user_id, cabin_id])
