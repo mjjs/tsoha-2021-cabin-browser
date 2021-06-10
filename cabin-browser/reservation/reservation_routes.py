@@ -3,12 +3,12 @@ from flask import Blueprint, render_template, request, redirect, flash
 from flask_login import login_required, current_user
 from db import connection_pool
 from cabin_repository import CabinNotFoundError, CabinRepository
+from reservation import ReservationRepository
 from .reservation_service import (
     ReservationService,
     ReservationConflictError,
     ReservationInPastError,
 )
-from reservation import ReservationRepository
 
 reservation_routes = Blueprint(
     "reservation_routes", __name__, template_folder="templates"

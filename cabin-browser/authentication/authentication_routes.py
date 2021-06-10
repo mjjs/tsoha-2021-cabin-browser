@@ -21,6 +21,7 @@ INCORRECT_USER_OR_PW_MSG = "Incorrect username or password"
 
 authentication_service = AuthenticationService(UserRepository(connection_pool))
 
+
 @authentication_routes.route("/login", methods=["GET"])
 def login_get():
     if current_user.is_authenticated:

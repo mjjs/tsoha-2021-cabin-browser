@@ -1,4 +1,4 @@
-from flask import Flask, g, redirect, render_template
+from flask import Flask, redirect, render_template
 from flask_login import LoginManager
 from werkzeug.exceptions import RequestEntityTooLarge
 from config import (
@@ -13,7 +13,7 @@ from db import connection_pool
 
 from authentication import authentication_routes
 from cabin_routes import cabin_routes
-from keyword_routes import keyword_routes
+from keywords import keyword_routes
 from reservation import reservation_routes
 from review import review_routes
 

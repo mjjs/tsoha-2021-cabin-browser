@@ -11,9 +11,10 @@ review_routes = Blueprint("review_routes", __name__, template_folder="templates"
 cabin_repository = CabinRepository(connection_pool)
 
 review_service = ReviewService(
-        review_repository=ReviewRepository(connection_pool),
-        cabin_repository=cabin_repository,
-        )
+    review_repository=ReviewRepository(connection_pool),
+    cabin_repository=cabin_repository,
+)
+
 
 @review_routes.route("/cabins/<int:id>/review", methods=["GET"])
 @login_required
@@ -32,10 +33,7 @@ def review_post(id):
     content = request.form["content"]
 
     review_service.add_review(
-            rating=rating,
-            content=content,
-            user_id=current_user.id,
-            cabin_id=id
+        rating=rating, content=content, user_id=current_user.id, cabin_id=id
     )
 
     flash("Review added.", "success")

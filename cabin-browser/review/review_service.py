@@ -1,6 +1,7 @@
 from cabin_repository import CabinNotFoundError
 from enum import Enum
 
+
 class ReviewService:
     def __init__(self, review_repository, cabin_repository):
         self._review_repository = review_repository

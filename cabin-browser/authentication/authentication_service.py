@@ -2,6 +2,7 @@ from bcrypt import checkpw, gensalt, hashpw
 from user_repository import UserNotFoundError, UserExistsError
 from flask_login import login_user, logout_user
 
+
 class AuthenticationService:
     def __init__(self, user_repository):
         self._user_repository = user_repository
