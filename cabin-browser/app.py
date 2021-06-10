@@ -15,7 +15,7 @@ from authentication import authentication_routes
 from cabin_routes import cabin_routes
 from keyword_routes import keyword_routes
 from reservation_routes import reservation_routes
-from review_routes import review_routes
+from review import review_routes
 
 app = Flask(__name__)
 app.register_blueprint(authentication_routes)
@@ -28,7 +28,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 
 login_manager = LoginManager()
-login_manager.login_view = "login_routes.login_get"
+login_manager.login_view = "authentication_routes.login_get"
 login_manager.init_app(app)
 
 

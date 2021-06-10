@@ -7,7 +7,7 @@ from user_repository import UserNotFoundError, UserRepository
 from cabin_image_repository import CabinImageRepository
 from reservation_repository import ReservationRepository
 from keyword_repository import KeywordRepository
-from review_repository import ReviewRepository
+from review import ReviewRepository
 from municipality_repository import MunicipalityRepository
 from user import UserRole
 from validators import (
