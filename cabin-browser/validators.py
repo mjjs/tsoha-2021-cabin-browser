@@ -3,6 +3,7 @@ from imghdr import what
 from db import connection_pool
 from municipality import MunicipalityRepository
 
+common_passwords = None
 
 def validate_name(name):
     return not is_empty(name)
@@ -21,8 +22,15 @@ def validate_role(role):
 
 
 def validate_password_complexity(password):
-    # TODO: implement this
-    return True
+    global common_passwords
+
+    if len(password) == 0:
+        return False
+
+    if not common_passwords:
+        _populate_common_passwords()
+
+    return password not in common_passwords
 
 
 def is_empty(x):
@@ -52,3 +60,15 @@ def is_valid_image(img):
     img.seek(0)
 
     return is_valid
+
+# Passwords are populated from https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/10-million-password-list-top-100000.txt
+def _populate_common_passwords():
+    global common_passwords
+
+    common_passwords = set()
+
+    with open("10-million-password-list-top-100000.txt") as f:
+        lines = f.readlines()
+
+        for line in lines:
+            common_passwords.add(line.rstrip())

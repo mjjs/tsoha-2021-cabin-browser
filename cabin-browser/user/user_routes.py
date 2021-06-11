@@ -87,7 +87,7 @@ def register_user():
         error = True
 
     if not validate_password_complexity(password):
-        flash("To be written")
+        flash("Your password is too common. Please choose a more unique password.")
         error = True
 
     role = request.form["role"]
