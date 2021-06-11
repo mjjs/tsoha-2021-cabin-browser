@@ -64,7 +64,7 @@
     <div class="form-group">
         Can't find your keyword?
         <br>
-        <details>
+        <details id="keyword-details">
             <summary class="btn btn-primary btn-sm">
                 Add a new keyword
             </summary>
@@ -144,8 +144,8 @@
                 node.text = keyword;
                 node.value = res;
                 keywords.options.add(node);
-                toggleKwWrapperVisibility();
                 document.getElementById("new-keyword").value = null;
+                document.getElementById("keyword-details").open = undefined;
             });
         };
 
