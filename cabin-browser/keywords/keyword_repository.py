@@ -33,6 +33,17 @@ class KeywordRepository(Repository):
         rows = Repository._get_all(self)
         return [Keyword(id, keyword) for (id, keyword) in rows]
 
+    def get_all_used(self):
+        cursor = self._connection_pool.cursor()
+        sql = """
+            SELECT kw.id, kw.keyword FROM keywords kw
+            WHERE kw.id IN (SELECT keyword_id FROM cabins_keywords)
+            """
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+
+        return [Keyword(id, keyword) for (id, keyword) in rows]
+
     def get_by_cabin_id(self, cabin_id):
         cursor = self._connection_pool.cursor()
         sql = """

@@ -42,13 +42,13 @@ def get_all_cabins():
 
     cabins = cabin_service.get_all_cabins(user_id)
 
-    all_keywords = keyword_service.get_all_keywords()
+    used_keywords = keyword_service.get_all_keywords_in_use()
     municipalities = municipality_repository.get_all_used()
 
     return render_template(
         "cabins.html",
         cabins=cabins,
-        keywords=all_keywords,
+        keywords=used_keywords,
         municipalities=municipalities,
     )
 

@@ -25,3 +25,6 @@ class KeywordService:
 
     def get_all_keywords(self):
         return self._keyword_repository.get_all()
+
+    def get_all_keywords_in_use(self):
+        return self._keyword_repository.get_all_used()
