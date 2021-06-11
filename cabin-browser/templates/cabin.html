@@ -99,7 +99,7 @@
                 Reserve this cabin
             </a>
         </p>
-    {% else %}
+    {% elif not current_user.is_authenticated %}
         <p>
             <a href="/login?next=/reservations/{{ cabin.id }}">Log in</a> to reserve this cabin.
         </p>
