@@ -8,17 +8,16 @@ from config import (
     PORT,
     MAX_CONTENT_LENGTH,
 )
-from user_repository import UserRepository
+from user import UserRepository, user_routes
 from db import connection_pool
 
-from authentication import authentication_routes
 from cabin_routes import cabin_routes
 from keywords import keyword_routes
 from reservation import reservation_routes
 from review import review_routes
 
 app = Flask(__name__)
-app.register_blueprint(authentication_routes)
+app.register_blueprint(user_routes)
 app.register_blueprint(cabin_routes)
 app.register_blueprint(keyword_routes)
 app.register_blueprint(reservation_routes)
@@ -28,7 +27,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 
 login_manager = LoginManager()
-login_manager.login_view = "authentication_routes.login_get"
+login_manager.login_view = "user_routes.login_get"
 login_manager.init_app(app)
 
 

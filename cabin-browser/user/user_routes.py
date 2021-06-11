@@ -2,7 +2,6 @@ from urllib.parse import urlparse, urljoin
 from flask import Blueprint, redirect, flash, request, render_template
 from flask_login import login_required, current_user
 from db import connection_pool
-from user_repository import UserRepository
 from validators import (
     validate_name,
     validate_email,
@@ -11,18 +10,17 @@ from validators import (
     validate_role,
 )
 
-from .authentication_service import AuthenticationService
+from .user_service import UserService
+from .user_repository import UserRepository
 
-authentication_routes = Blueprint(
-    "authentication_routes", __name__, template_folder="templates"
-)
+user_routes = Blueprint("user_routes", __name__, template_folder="templates")
 
 INCORRECT_USER_OR_PW_MSG = "Incorrect username or password"
 
-authentication_service = AuthenticationService(UserRepository(connection_pool))
+user_service = UserService(UserRepository(connection_pool))
 
 
-@authentication_routes.route("/login", methods=["GET"])
+@user_routes.route("/login", methods=["GET"])
 def login_get():
     if current_user.is_authenticated:
         flash("You must log out before logging in", "error")
@@ -35,21 +33,21 @@ def login_get():
     return render_template("login.html", next_page=next_page or "")
 
 
-@authentication_routes.route("/login", methods=["POST"])
+@user_routes.route("/login", methods=["POST"])
 def login_post():
     email = request.form["email"]
     password = request.form["password"]
 
-    user = authentication_service.get_user_by_email(email)
+    user = user_service.get_user_by_email(email)
     if not user:
         flash(INCORRECT_USER_OR_PW_MSG, "error")
         return redirect("/login")
 
-    if not authentication_service.check_user_password(user.id, password):
+    if not user_service.check_user_password(user.id, password):
         flash(INCORRECT_USER_OR_PW_MSG, "error")
         return redirect("/login")
 
-    authentication_service.log_user_in(user)
+    user_service.log_user_in(user)
     next_page = request.args.get("next")
     flash("Login successful", "success")
 
@@ -59,7 +57,7 @@ def login_post():
     return redirect(next_page or "/")
 
 
-@authentication_routes.route("/register", methods=["GET"])
+@user_routes.route("/register", methods=["GET"])
 def render_register_page():
     if current_user.is_authenticated:
         return redirect("/")
@@ -67,7 +65,7 @@ def render_register_page():
     return render_template("register.html")
 
 
-@authentication_routes.route("/register", methods=["POST"])
+@user_routes.route("/register", methods=["POST"])
 def register_user():
     error = False
 
@@ -100,7 +98,7 @@ def register_user():
     if error:
         return redirect("/register")
 
-    if not authentication_service.add_user(email, name, password, role):
+    if not user_service.add_user(email, name, password, role):
         flash("A user already exists with the given email.", "error")
         return redirect("/register")
 
@@ -108,10 +106,10 @@ def register_user():
     return redirect("/login")
 
 
-@authentication_routes.route("/logout", methods=["GET"])
+@user_routes.route("/logout", methods=["GET"])
 @login_required
 def logout_get():
-    authentication_service.log_user_out()
+    user_service.log_user_out()
     flash("Logged out successfully.", "success")
     return redirect("/")
 
