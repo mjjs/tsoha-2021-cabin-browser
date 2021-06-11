@@ -22,13 +22,13 @@ class MunicipalityRepository(Repository):
         return [Municipality(id, name) for (id, name) in rows]
 
     def get_all_used(self):
-        cursor = self._connection_pool.cursor()
-        sql = """
-            SELECT id, name FROM municipalities WHERE id IN
-            (SELECT municipality_id FROM cabins GROUP BY municipality_id)
-        """
+        with self._connection_pool.cursor() as cursor:
+            sql = """
+                SELECT id, name FROM municipalities WHERE id IN
+                (SELECT municipality_id FROM cabins GROUP BY municipality_id)
+            """
 
-        cursor.execute(sql)
-        rows = cursor.fetchall()
+            cursor.execute(sql)
+            rows = cursor.fetchall()
 
-        return [Municipality(id, name) for (id, name) in rows]
+            return [Municipality(id, name) for (id, name) in rows]

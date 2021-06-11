@@ -34,30 +34,29 @@ class KeywordRepository(Repository):
         return [Keyword(id, keyword) for (id, keyword) in rows]
 
     def get_all_used(self):
-        cursor = self._connection_pool.cursor()
-        sql = """
-            SELECT kw.id, kw.keyword FROM keywords kw
-            WHERE kw.id IN (SELECT keyword_id FROM cabins_keywords)
-            """
-        cursor.execute(sql)
-        rows = cursor.fetchall()
+        with self._connection_pool.cursor() as cursor:
+            sql = """
+                SELECT kw.id, kw.keyword FROM keywords kw
+                WHERE kw.id IN (SELECT keyword_id FROM cabins_keywords)
+                """
+            cursor.execute(sql)
+            rows = cursor.fetchall()
 
-        return [Keyword(id, keyword) for (id, keyword) in rows]
+            return [Keyword(id, keyword) for (id, keyword) in rows]
 
     def get_by_cabin_id(self, cabin_id):
-        cursor = self._connection_pool.cursor()
-        sql = """
-            SELECT kw.id, kw.keyword FROM keywords kw
-            LEFT JOIN cabins_keywords ck ON (ck.keyword_id = kw.id)
-            WHERE ck.cabin_id = %s
-        """
-        cursor.execute(sql, (cabin_id,))
-        rows = cursor.fetchall()
+        with self._connection_pool.cursor() as cursor:
+            sql = """
+                SELECT kw.id, kw.keyword FROM keywords kw
+                LEFT JOIN cabins_keywords ck ON (ck.keyword_id = kw.id)
+                WHERE ck.cabin_id = %s
+            """
+            cursor.execute(sql, (cabin_id,))
+            rows = cursor.fetchall()
 
-        return [Keyword(id, keyword) for (id, keyword) in rows]
+            return [Keyword(id, keyword) for (id, keyword) in rows]
 
     def add_to_cabin(self, keyword_id, cabin_id):
-        cursor = self._connection_pool.cursor()
-        sql = "INSERT INTO cabins_keywords(keyword_id, cabin_id) VALUES (%s, %s)"
-        cursor.execute(sql, (keyword_id, cabin_id))
-        cursor.close()
+        with self._connection_pool.cursor() as cursor:
+            sql = "INSERT INTO cabins_keywords(keyword_id, cabin_id) VALUES (%s, %s)"
+            cursor.execute(sql, (keyword_id, cabin_id))

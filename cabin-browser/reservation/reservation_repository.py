@@ -25,19 +25,18 @@ class ReservationRepository(Repository):
         Repository._add(self=self, values=[start, end, user_id, cabin_id])
 
     def get_by_cabin_id(self, cabin_id):
-        cursor = self._connection_pool.cursor()
-        sql = """
-            SELECT id, start_date, end_date, user_id, cabin_id FROM reservations
-            WHERE cabin_id = %s AND start_date > CURRENT_DATE
-            ORDER BY start_date ASC
-        """
-        cursor.execute(sql, (cabin_id,))
-        rows = cursor.fetchall()
-        cursor.close()
+        with self._connection_pool.cursor() as cursor:
+            sql = """
+                SELECT id, start_date, end_date, user_id, cabin_id FROM reservations
+                WHERE cabin_id = %s AND start_date > CURRENT_DATE
+                ORDER BY start_date ASC
+            """
+            cursor.execute(sql, (cabin_id,))
+            rows = cursor.fetchall()
 
-        reservations = []
-        for row in rows:
-            (id, start, end, user_id, cabin_id) = row
-            reservations.append(Reservation(id, start, end, user_id, cabin_id))
+            reservations = []
+            for row in rows:
+                (id, start, end, user_id, cabin_id) = row
+                reservations.append(Reservation(id, start, end, user_id, cabin_id))
 
-        return reservations
+            return reservations

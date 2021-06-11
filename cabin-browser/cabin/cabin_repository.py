@@ -69,68 +69,119 @@ class CabinRepository(Repository):
         Repository._delete(self, id)
 
     def get_all(self):
-        cursor = self._connection_pool.cursor()
+        with self._connection_pool.cursor() as cursor:
+            sql = """
+                SELECT
+                    c.id, c.name, c.address, c.price, c.description,
+                    m.name municipality_name,
+                    (SELECT SUM(rating)/COUNT(rating) FROM reviews WHERE cabin_id = c.id) avg_rating,
+                    u.id
+                FROM cabins c
+                LEFT JOIN municipalities m ON m.id = c.municipality_id
+                LEFT JOIN users u ON u.id = c.owner_id
+            """
 
-        sql = """
-            SELECT
-                c.id, c.name, c.address, c.price, c.description,
-                m.name municipality_name,
-                (SELECT SUM(rating)/COUNT(rating) FROM reviews WHERE cabin_id = c.id) avg_rating,
-                u.id
-            FROM cabins c
-            LEFT JOIN municipalities m ON m.id = c.municipality_id
-            LEFT JOIN users u ON u.id = c.owner_id
-        """
+            cursor.execute(sql)
+            rows = cursor.fetchall()
 
-        cursor.execute(sql)
-        rows = cursor.fetchall()
+            cabins = []
+            for (
+                id,
+                name,
+                address,
+                price,
+                description,
+                municipality_name,
+                avg_rating,
+                owner_id,
+            ) in rows:
+                cabins.append(
+                    Cabin(
+                        id=id,
+                        name=name,
+                        price=price / 1000000,
+                        description=description,
+                        address=address,
+                        municipality=municipality_name,
+                        avg_rating=avg_rating,
+                        owner_id=owner_id,
+                    )
+                )
 
-        cabins = []
-        for (
-            id,
-            name,
-            address,
-            price,
-            description,
-            municipality_name,
-            avg_rating,
-            owner_id,
-        ) in rows:
-            cabins.append(
+            return cabins
+
+    def get_all_by_owner_id(self, owner_id):
+        with self._connection_pool.cursor() as cursor:
+            sql = """
+                SELECT
+                    c.id, c.name, c.address, c.price, c.description,
+                    m.name municipality_name,
+                    (SELECT SUM(rating)/COUNT(rating) FROM reviews WHERE cabin_id = c.id) avg_rating,
+                    u.id
+                FROM cabins c
+                LEFT JOIN municipalities m ON m.id = c.municipality_id
+                LEFT JOIN users u ON u.id = c.owner_id
+                WHERE c.owner_id = %s
+            """
+
+            cursor.execute(sql, (owner_id,))
+            rows = cursor.fetchall()
+
+            return [
                 Cabin(
-                    id=id,
-                    name=name,
-                    price=price / 1000000,
-                    description=description,
-                    address=address,
+                    id=cabin_id,
+                    name=cabin_name,
+                    price=cabin_price / 1000000,
+                    description=cabin_description,
+                    address=cabin_address,
                     municipality=municipality_name,
                     avg_rating=avg_rating,
                     owner_id=owner_id,
                 )
-            )
+                for (
+                    cabin_id,
+                    cabin_name,
+                    cabin_address,
+                    cabin_price,
+                    cabin_description,
+                    municipality_name,
+                    avg_rating,
+                    owner_id,
+                ) in rows
+            ]
 
-        return cabins
+    def get(self, id):
+        with self._connection_pool.cursor() as cursor:
+            sql = """
+                SELECT
+                    c.id, c.name, c.address, c.price, c.description,
+                    m.name municipality_name,
+                    (SELECT SUM(rating)/COUNT(rating) FROM reviews WHERE cabin_id = c.id) avg_rating,
+                    u.id
+                FROM cabins c
+                LEFT JOIN municipalities m ON m.id = c.municipality_id
+                LEFT JOIN users u ON u.id = c.owner_id
+                WHERE c.id = %s
+            """
 
-    def get_all_by_owner_id(self, owner_id):
-        cursor = self._connection_pool.cursor()
+            cursor.execute(sql, (id,))
 
-        sql = """
-            SELECT
-                c.id, c.name, c.address, c.price, c.description,
-                m.name municipality_name,
-                (SELECT SUM(rating)/COUNT(rating) FROM reviews WHERE cabin_id = c.id) avg_rating,
-                u.id
-            FROM cabins c
-            LEFT JOIN municipalities m ON m.id = c.municipality_id
-            LEFT JOIN users u ON u.id = c.owner_id
-            WHERE c.owner_id = %s
-        """
+            row = cursor.fetchone()
+            if not row:
+                raise CabinNotFoundError(id)
 
-        cursor.execute(sql, (owner_id,))
-        rows = cursor.fetchall()
+            (
+                cabin_id,
+                cabin_name,
+                cabin_address,
+                cabin_price,
+                cabin_description,
+                municipality_name,
+                avg_rating,
+                owner_id,
+            ) = row
 
-        return [
-            Cabin(
+            return Cabin(
                 id=cabin_id,
                 name=cabin_name,
                 price=cabin_price / 1000000,
@@ -140,57 +191,3 @@ class CabinRepository(Repository):
                 avg_rating=avg_rating,
                 owner_id=owner_id,
             )
-            for (
-                cabin_id,
-                cabin_name,
-                cabin_address,
-                cabin_price,
-                cabin_description,
-                municipality_name,
-                avg_rating,
-                owner_id,
-            ) in rows
-        ]
-
-    def get(self, id):
-        cursor = self._connection_pool.cursor()
-
-        sql = """
-            SELECT
-                c.id, c.name, c.address, c.price, c.description,
-                m.name municipality_name,
-                (SELECT SUM(rating)/COUNT(rating) FROM reviews WHERE cabin_id = c.id) avg_rating,
-                u.id
-            FROM cabins c
-            LEFT JOIN municipalities m ON m.id = c.municipality_id
-            LEFT JOIN users u ON u.id = c.owner_id
-            WHERE c.id = %s
-        """
-
-        cursor.execute(sql, (id,))
-
-        row = cursor.fetchone()
-        if not row:
-            raise CabinNotFoundError(id)
-
-        (
-            cabin_id,
-            cabin_name,
-            cabin_address,
-            cabin_price,
-            cabin_description,
-            municipality_name,
-            avg_rating,
-            owner_id,
-        ) = row
-
-        return Cabin(
-            id=cabin_id,
-            name=cabin_name,
-            price=cabin_price / 1000000,
-            description=cabin_description,
-            address=cabin_address,
-            municipality=municipality_name,
-            avg_rating=avg_rating,
-            owner_id=owner_id,
-        )
