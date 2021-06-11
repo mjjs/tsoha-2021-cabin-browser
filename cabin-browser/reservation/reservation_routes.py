@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from db import connection_pool
 from cabin.cabin_repository import CabinNotFoundError, CabinRepository
 from reservation import ReservationRepository
+from user import UserRole
 from .reservation_service import (
     ReservationService,
     ReservationConflictError,
@@ -24,6 +25,10 @@ reservation_service = ReservationService(
 @reservation_routes.route("/reservations/<int:cabin_id>", methods=["GET"])
 @login_required
 def reservation_get(cabin_id):
+    if current_user.role != UserRole.CUSTOMER.value:
+        flash("Please log in as a customer to make reservations.", "error")
+        return redirect(f"/cabins/{cabin_id}")
+
     try:
         cabin = cabin_repository.get(cabin_id)
         current_reservations = reservation_service.get_cabin_reservations(cabin_id)
@@ -38,6 +43,10 @@ def reservation_get(cabin_id):
 @reservation_routes.route("/reservations/<int:cabin_id>", methods=["POST"])
 @login_required
 def reservation_post(cabin_id):
+    if current_user.role != UserRole.CUSTOMER.value:
+        flash("Please log in as a customer to make reservations.", "error")
+        return redirect(f"/cabins/{cabin_id}")
+
     error = False
 
     start_date = request.form["start_date"]

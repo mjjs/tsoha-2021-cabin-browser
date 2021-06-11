@@ -93,7 +93,7 @@
     {% else %}
         <p>This cabin has no reservations currently.
     {% endif %}
-    {% if current_user.is_authenticated %}
+    {% if current_user.is_authenticated and current_user.role == "CUSTOMER"%}
         <p>
             <a class="btn btn-primary" href="/reservations/{{ cabin.id }}">
                 Reserve this cabin
