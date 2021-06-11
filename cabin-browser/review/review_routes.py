@@ -16,24 +16,32 @@ review_service = ReviewService(
 )
 
 
-@review_routes.route("/cabins/<int:id>/review", methods=["GET"])
+@review_routes.route("/cabins/<int:cabin_id>/review", methods=["GET"])
 @login_required
-def review_get(id):
+def review_get(cabin_id):
+    if current_user.role != UserRole.CUSTOMER.value:
+        flash("Please log in as a customer to write reviews.", "error")
+        return redirect(f"/cabins/{cabin_id}")
+
     try:
-        cabin = cabin_repository.get(id)
+        cabin = cabin_repository.get(cabin_id)
         return render_template("review.html", cabin=cabin)
     except CabinNotFoundError:
         return render_template("404.html")
 
 
-@review_routes.route("/cabins/<int:id>/review", methods=["POST"])
+@review_routes.route("/cabins/<int:cabin_id>/review", methods=["POST"])
 @login_required
-def review_post(id):
+def review_post(cabin_id):
+    if current_user.role != UserRole.CUSTOMER.value:
+        flash("Please log in as a customer to write reviews.", "error")
+        return redirect(f"/cabins/{cabin_id}")
+
     rating = request.form["rating"]
     content = request.form["content"]
 
     review_service.add_review(
-        rating=rating, content=content, user_id=current_user.id, cabin_id=id
+        rating=rating, content=content, user_id=current_user.id, cabin_id=cabin_id
     )
 
     flash("Review added.", "success")
