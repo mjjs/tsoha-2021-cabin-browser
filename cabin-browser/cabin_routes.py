@@ -8,7 +8,7 @@ from cabin_image_repository import CabinImageRepository
 from reservation import ReservationRepository
 from keywords import KeywordRepository
 from review import ReviewRepository
-from municipality_repository import MunicipalityRepository
+from municipality import MunicipalityRepository
 from user import UserRole
 from validators import (
     validate_name,

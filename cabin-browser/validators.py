@@ -1,7 +1,7 @@
 from re import match
 from imghdr import what
 from db import connection_pool
-from municipality_repository import MunicipalityRepository
+from municipality import MunicipalityRepository
 
 
 def validate_name(name):
