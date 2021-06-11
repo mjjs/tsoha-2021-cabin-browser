@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, request, redirect, flash
 from flask_login import login_required, current_user
 from user import UserRole
 from db import connection_pool
-from cabin_repository import CabinNotFoundError, CabinRepository
+from cabin.cabin_repository import CabinNotFoundError, CabinRepository
 from .review_repository import ReviewRepository
 from .review_service import ReviewService
 

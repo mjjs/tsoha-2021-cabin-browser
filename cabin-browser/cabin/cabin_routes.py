@@ -1,15 +1,11 @@
-from base64 import b64encode
 from flask import Blueprint, render_template, request, redirect, flash
 from flask_login import login_required, current_user
 from db import connection_pool
-from cabin_repository import CabinNotFoundError, CabinRepository
-from user import UserNotFoundError, UserRepository
-from cabin_image_repository import CabinImageRepository
+from user import UserRepository, UserService, UserRole
 from reservation import ReservationRepository
-from keywords import KeywordRepository
+from keywords import KeywordService, KeywordRepository
 from review import ReviewRepository
 from municipality import MunicipalityRepository
-from user import UserRole
 from validators import (
     validate_name,
     is_empty,
@@ -17,37 +13,36 @@ from validators import (
     is_valid_price_str,
     is_valid_image,
 )
+from .cabin_service import CabinService
+from .cabin_repository import CabinRepository
+from .cabin_image_repository import CabinImageRepository
 
 cabin_routes = Blueprint("cabin_routes", __name__, template_folder="templates")
 
-cabin_repository = CabinRepository(connection_pool)
-cabin_image_repository = CabinImageRepository(connection_pool)
-keyword_repository = KeywordRepository(connection_pool)
 municipality_repository = MunicipalityRepository(connection_pool)
 reservation_repository = ReservationRepository(connection_pool)
 review_repository = ReviewRepository(connection_pool)
-user_repository = UserRepository(connection_pool)
+
+user_service = UserService(UserRepository(connection_pool))
+keyword_service = KeywordService(KeywordRepository(connection_pool))
+cabin_service = CabinService(
+    cabin_repository=CabinRepository(connection_pool),
+    cabin_image_repository=CabinImageRepository(connection_pool),
+    reservation_repository=reservation_repository,
+    keyword_repository=KeywordRepository(connection_pool),
+)
 
 
 @cabin_routes.route("/cabins", methods=["GET"])
 def get_all_cabins():
     user_id = request.args.get("owner")
     if user_id:
-        if current_user.role == UserRole.CUSTOMER.value:
+        if current_user.role in (UserRole.ADMIN.value, UserRole.CUSTOMER.value):
             return redirect("/cabins")
 
-    cabins = []
-    if user_id:
-        cabins = cabin_repository.get_all_by_owner_id(user_id)
-    else:
-        cabins = cabin_repository.get_all()
+    cabins = cabin_service.get_all_cabins(user_id)
 
-    for cabin in cabins:
-        cabin.images = [cabin_image_repository.get_default_cabin_image(cabin.id)]
-        cabin.reservations = reservation_repository.get_by_cabin_id(cabin.id)
-        cabin.keywords = keyword_repository.get_by_cabin_id(cabin.id)
-
-    all_keywords = keyword_repository.get_all()
+    all_keywords = keyword_service.get_all_keywords()
     municipalities = municipality_repository.get_all_used()
 
     return render_template(
@@ -64,37 +59,33 @@ def delete_cabin(id):
     if current_user.role == UserRole.CUSTOMER.value:
         return "NOT OK", 403
 
-    cabin = cabin_repository.get(id)
+    deleted = False
 
-    if current_user.role == UserRole.CABIN_OWNER.value:
-        if cabin.owner_id != current_user.id:
-            return "NOT OK", 403
+    if current_user.role == UserRole.ADMIN.value:
+        deleted = cabin_service.delete_cabin(id)
+    else:
+        deleted = cabin_service.delete_cabin(id, current_user.id)
 
-    cabin_repository.delete(id)
+    if not deleted:
+        return "NOT OK", 403
 
     return "OK"
 
 
 @cabin_routes.route("/cabins/<int:id>", methods=["GET"])
 def get_cabin(id):
-    cabin = None
-
-    try:
-        cabin = cabin_repository.get(id)
-    except CabinNotFoundError:
+    cabin = cabin_service.get_cabin(id)
+    if not cabin:
+        flash(f"No cabin found with id {id}", "error")
         return render_template("404.html")
 
-    owner = None
-
-    try:
-        owner = user_repository.get(cabin.owner_id)
-    except UserNotFoundError:
+    owner = user_service.get_user(cabin.owner_id)
+    if not owner:
         return render_template("500.html")
 
     reviews = review_repository.get_by_cabin_id(id)
-    cabin.images = cabin_image_repository.get_by_cabin_id(id)
     reservations = reservation_repository.get_by_cabin_id(id)
-    keywords = keyword_repository.get_by_cabin_id(id)
+    keywords = keyword_service.get_cabin_keywords(id)
 
     return render_template(
         "cabin.html",
@@ -110,11 +101,11 @@ def get_cabin(id):
 @login_required
 def new_cabin_page():
     if current_user.role != UserRole.CABIN_OWNER.value:
-        flash("Only cabin owners can add new cabins", "error")
+        flash("Only cabin owners can add new cabins.", "error")
         return render_template("cabins.html"), 403
 
     municipalities = municipality_repository.get_all()
-    keywords = keyword_repository.get_all()
+    keywords = keyword_service.get_all_keywords()
 
     return render_template(
         "addcabin.html", municipalities=municipalities, keywords=keywords
@@ -170,27 +161,18 @@ def create_new_cabin():
     if error:
         return redirect("/newcabin")
 
-    # TODO: Do these in a transaction?
-    cabin_id = cabin_repository.add(
-        address,
-        float(price) * 1000000,
-        description,
-        municipality_id,
-        name,
-        current_user.id,
+    default_image_name = request.form["default_image"]
+    added_cabin_id = cabin_service.add_cabin(
+        address=address,
+        price=float(price),
+        description=description,
+        municipality_id=municipality_id,
+        name=name,
+        owner_id=current_user.id,
+        keywords=keywords,
+        images=images,
+        default_image_name=default_image_name,
     )
 
-    for kw in keywords:
-        keyword_repository.add_to_cabin(kw, cabin_id)
-
-    if "default_image" in request.form:
-        default_image = request.form["default_image"]
-
-        for image in images:
-            mimetype = image.mimetype
-            b64 = b64encode(image.read()).decode()
-            default = default_image == image.filename
-            cabin_image_repository.add(f"{mimetype};base64,{b64}", cabin_id, default)
-
     flash("Cabin added.", "success")
-    return redirect(f"/cabins/{cabin_id}")
+    return redirect(f"/cabins/{added_cabin_id}")

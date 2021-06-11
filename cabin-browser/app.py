@@ -11,7 +11,7 @@ from config import (
 from user import UserRepository, user_routes
 from db import connection_pool
 
-from cabin_routes import cabin_routes
+from cabin import cabin_routes
 from keywords import keyword_routes
 from reservation import reservation_routes
 from review import review_routes

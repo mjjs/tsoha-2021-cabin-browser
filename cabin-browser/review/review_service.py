@@ -1,5 +1,5 @@
-from cabin_repository import CabinNotFoundError
 from enum import Enum
+from cabin.cabin_repository import CabinNotFoundError
 
 
 class ReviewService:
