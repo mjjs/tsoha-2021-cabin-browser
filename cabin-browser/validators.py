@@ -5,6 +5,7 @@ from municipality import MunicipalityRepository
 
 common_passwords = None
 
+
 def validate_name(name):
     return not is_empty(name)
 
@@ -60,6 +61,7 @@ def is_valid_image(img):
     img.seek(0)
 
     return is_valid
+
 
 # Passwords are populated from https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/10-million-password-list-top-100000.txt
 def _populate_common_passwords():
