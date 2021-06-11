@@ -1,3 +1,6 @@
+from db import commit_transaction
+
+
 class EmptyKeywordError(Exception):
     pass
 
@@ -11,7 +14,9 @@ class KeywordService:
             raise EmptyKeywordError()
 
         try:
-            return str(self._keyword_repository.add(keyword))
+            keyword_id = str(self._keyword_repository.add(keyword))
+            commit_transaction()
+            return keyword_id
         except:
             return None
 

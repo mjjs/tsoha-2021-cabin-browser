@@ -1,6 +1,7 @@
 from bcrypt import checkpw, gensalt, hashpw
-from .user_repository import UserNotFoundError, UserExistsError
 from flask_login import login_user, logout_user
+from db import commit_transaction, rollback_transaction
+from .user_repository import UserNotFoundError, UserExistsError
 
 
 class UserService:
@@ -24,8 +25,10 @@ class UserService:
 
         try:
             self._user_repository.add(email, name, hashed_password, role)
+            commit_transaction()
             return True
         except UserExistsError:
+            rollback_transaction()
             return False
 
     def check_user_password(self, user_id, password):

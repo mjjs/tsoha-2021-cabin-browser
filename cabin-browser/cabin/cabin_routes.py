@@ -161,7 +161,7 @@ def create_new_cabin():
     if error:
         return redirect("/newcabin")
 
-    default_image_name = request.form["default_image"]
+    default_image_name = request.form.get("default_image") or None
     added_cabin_id = cabin_service.add_cabin(
         address=address,
         price=float(price),
@@ -173,6 +173,10 @@ def create_new_cabin():
         images=images,
         default_image_name=default_image_name,
     )
+
+    if not added_cabin_id:
+        flash("Cabin coult not be added. Please try again.", "error")
+        return redirect("/newcabin")
 
     flash("Cabin added.", "success")
     return redirect(f"/cabins/{added_cabin_id}")

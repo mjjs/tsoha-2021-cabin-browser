@@ -1,4 +1,5 @@
 from datetime import date
+from db import commit_transaction
 
 
 class ReservationInPastError(Exception):
@@ -49,3 +50,5 @@ class ReservationService:
             user_id=user_id,
             cabin_id=cabin_id,
         )
+
+        commit_transaction()

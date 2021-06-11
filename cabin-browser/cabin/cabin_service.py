@@ -1,4 +1,5 @@
 from base64 import b64encode
+from db import commit_transaction, rollback_transaction
 from .cabin_repository import CabinNotFoundError
 
 
@@ -43,15 +44,12 @@ class CabinService:
     def delete_cabin(self, cabin_id, user_id=None):
         cabin = self._cabin_repository.get(cabin_id)
 
-        if not user_id:
+        if not user_id or user_id == cabin.owner_id:
             self._cabin_repository.delete(cabin_id)
+            commit_transaction()
             return True
 
-        if cabin.owner_id != user_id:
-            return False
-
-        self._cabin_repository.delete(cabin_id)
-        return True
+        return False
 
     def add_cabin(
         self,
@@ -65,7 +63,6 @@ class CabinService:
         images,
         default_image_name,
     ):
-        # TODO: START TRANSACTION
         price_microcurrency = price * 1_000_000
 
         try:
@@ -89,8 +86,8 @@ class CabinService:
                     f"{mimetype};base64,{b64}", cabin_id, default
                 )
 
-            # TODO: COMMIT TRANSACTION
+            commit_transaction()
             return cabin_id
         except:
-            # TODO: ROLLBACK TRANSACTION
+            rollback_transaction()
             return None

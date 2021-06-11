@@ -1,4 +1,5 @@
 from enum import Enum
+from db import commit_transaction
 from cabin.cabin_repository import CabinNotFoundError
 
 
@@ -14,6 +15,7 @@ class ReviewService:
             user_id=user_id,
             cabin_id=cabin_id,
         )
+        commit_transaction()
 
     def delete_review(self, cabin_id, review_id, current_user_id):
         try:
@@ -22,6 +24,7 @@ class ReviewService:
 
             if current_user_id in (cabin.owner_id, review.user_id):
                 self._review_repository.delete_review(review_id)
+                commit_transaction()
 
                 return True
 
