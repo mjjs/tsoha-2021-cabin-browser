@@ -14,7 +14,10 @@ no visitors lately.
 The original plan can be found over at [plan.md](./docs/plan.md).
 
 ## State of the project
-The project is almost completely finished. There are some finishing touches I want to do to it, but other than that, I think it's ready.
+I have refactored the code a bit. The repository classes inherit from a base Repository class, which
+holds common functionality for them. The business logic has also been moved away from the routes
+and into separate service classes. These service classes handle database transactions so that
+the repositories do not need to be aware of when to commit or rollback the transactions.
 
 ## Testing in Heroku
 The application can be found [here](https://cabin-browser.herokuapp.com). There are a few pre-made users that can be used when testing the application:
@@ -29,7 +32,4 @@ Cabin owners:
 You can also register a new user if you want. You can browse the cabins and add reviews/reservations to cabins as a customer. If you log in as a cabin owner, you can add new cabins also.
 
 ## TODO
-* Fix image links
-  * In a real application I would store the images on disk or in an S3 bucket. S3, however, might be overkill for a school project and Heroku clears all disk files on restart.
-* Add timestamps to reviews
-* Refactor code
+* Admin functionality to delete users.
