@@ -19,6 +19,8 @@ holds common functionality for them. The business logic has also been moved away
 and into separate service classes. These service classes handle database transactions so that
 the repositories do not need to be aware of when to commit or rollback the transactions.
 
+Apart from that, I have also added support for running the application in production using Gunicorn.
+
 ## Testing in Heroku
 The application can be found [here](https://cabin-browser.herokuapp.com). There are a few pre-made users that can be used when testing the application:
 
