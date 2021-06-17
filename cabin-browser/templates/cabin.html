@@ -68,7 +68,7 @@
         <p>The cabin owner has added no description.</p>
     {% endif %}
     <p><strong>Price:</strong> {{ cabin.price }}€ / night</p>
-    <p>Questions? <a href="mailto:{{ owner.email }}">Email the owner.</a></p>
+    <p>Questions? Email the owner at: <a href="mailto:{{ owner.email }}">{{ owner.email }}</a></p>
 
     <h3>Keywords</h3>
     {% if keywords|length > 0 %}
