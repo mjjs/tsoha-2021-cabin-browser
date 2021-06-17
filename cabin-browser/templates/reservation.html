@@ -62,6 +62,11 @@
         startPicker.min = today.toISOString().split("T")[0];
         endPicker.min = today.toISOString().split("T")[0];
 
+        const september = 8;
+        const nextYear = new Date(new Date().setFullYear(today.getFullYear()+1, september, 1));
+        startPicker.max = nextYear.toISOString().split("T")[0];
+        endPicker.max = nextYear.toISOString().split("T")[0];
+
         startPicker.onchange = (e) => {
             const [year, month, day] = e.currentTarget.value.split("-");
             endPicker.min = new Date(

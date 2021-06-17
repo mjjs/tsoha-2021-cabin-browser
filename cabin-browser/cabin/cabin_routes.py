@@ -8,10 +8,15 @@ from review import ReviewRepository
 from municipality import MunicipalityRepository
 from validators import (
     validate_name,
+    validate_address,
+    validate_description,
     is_empty,
     is_valid_municipality,
     is_valid_price_str,
     is_valid_image,
+    CABIN_NAME_MAX_LENGTH,
+    CABIN_DESCRIPTION_MAX_LENGTH,
+    CABIN_ADDRESS_MAX_LENGTH,
 )
 from .cabin_service import CabinService
 from .cabin_repository import CabinRepository
@@ -123,12 +128,18 @@ def create_new_cabin():
 
     name = request.form["name"]
     if not validate_name(name):
-        flash(f"Name {name} is not valid", "error")
+        flash(
+            f"Name cannot be empty and must be at most {CABIN_NAME_MAX_LENGTH} characters.",
+            "error",
+        )
         error = True
 
     address = request.form["address"]
-    if is_empty(address):
-        flash("Address cannot be empty.", "error")
+    if not validate_address(address):
+        flash(
+            f"Address cannot be empty and must be at most {CABIN_ADDRESS_MAX_LENGTH} characters.",
+            "error",
+        )
         error = True
 
     municipality_id = request.form["municipality"]
@@ -145,6 +156,10 @@ def create_new_cabin():
         error = True
 
     description = request.form["description"]
+    if not validate_description(description):
+        flash(f"Description must be at most {CABIN_DESCRIPTION_MAX_LENGTH} characters.")
+        error = True
+
     keywords = request.form.getlist("keywords")
     images = request.files.getlist("images")
 

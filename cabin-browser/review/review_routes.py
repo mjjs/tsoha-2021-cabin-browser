@@ -4,6 +4,11 @@ from flask_login import login_required, current_user
 from user import UserRole
 from db import connection_pool
 from cabin.cabin_repository import CabinNotFoundError, CabinRepository
+from validators import (
+    validate_review_content,
+    validate_review_rating,
+    REVIEW_CONTENT_MAX_LENGTH,
+)
 from .review_repository import ReviewRepository
 from .review_service import ReviewService
 
@@ -38,7 +43,16 @@ def review_post(cabin_id):
         return redirect(f"/cabins/{cabin_id}")
 
     rating = request.form["rating"]
+    if not validate_review_rating(int(rating)):
+        flash(f"The review rating must be a value from the range 1-5.")
+        return redirect(f"/cabins/{cabin_id}/review")
+
     content = request.form["content"]
+    if not validate_review_content(content):
+        flash(
+            f"The review content must be at most {REVIEW_CONTENT_MAX_LENGTH} characters."
+        )
+        return redirect(f"/cabins/{cabin_id}/review")
 
     review_service.add_review(
         rating=rating, content=content, user_id=current_user.id, cabin_id=cabin_id

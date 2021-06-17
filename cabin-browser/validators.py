@@ -5,13 +5,43 @@ from municipality import MunicipalityRepository
 
 common_passwords = None
 
+CABIN_NAME_MAX_LENGTH = 50
+CABIN_ADDRESS_MAX_LENGTH = 100
+CABIN_DESCRIPTION_MAX_LENGTH = 4000
+
+REVIEW_CONTENT_MAX_LENGTH = 4000
+
 
 def validate_name(name):
-    return not is_empty(name)
+    return not is_empty(name) and len(name) <= CABIN_NAME_MAX_LENGTH
+
+
+def validate_address(address):
+    return not is_empty(address) and len(address) <= CABIN_ADDRESS_MAX_LENGTH
+
+
+def validate_description(description):
+    if description is None:
+        return True
+
+    return (
+        not is_empty(description) and len(description) <= CABIN_DESCRIPTION_MAX_LENGTH
+    )
 
 
 def validate_email(email):
     return match(r".+@.+\..+", email) is not None
+
+
+def validate_review_content(content):
+    if content is None:
+        return True
+
+    return len(content) <= REVIEW_CONTENT_MAX_LENGTH
+
+
+def validate_review_rating(rating):
+    return 1 <= rating <= 5
 
 
 def passwords_match(password, confirm_password):

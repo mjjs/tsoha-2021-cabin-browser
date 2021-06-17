@@ -8,7 +8,7 @@
         <label>
             Cabin name
             <br>
-            <input class="form-control" type="text" name="name" required>
+            <input class="form-control" type="text" name="name" maxlength="50" required>
         </label>
     </div>
 
@@ -16,7 +16,7 @@
         <label>
             Cabin address
             <br>
-            <input class="form-control" type="text" name="address" required>
+            <input class="form-control" type="text" name="address" maxlength="100" required>
         </label>
     </div>
 
@@ -44,7 +44,7 @@
         <label>
             Cabin description
             <br>
-            <textarea class="form-control" name="description"></textarea>
+            <textarea class="form-control" name="description" maxlength="4000"></textarea>
         </label>
     </div>
 
@@ -72,7 +72,7 @@
                 <br>
                 <label>
                     <p>New keyword</p>
-                    <input class="form-control" type="text" id="new-keyword">
+                    <input class="form-control" type="text" id="new-keyword" maxlength="30">
                 </label>
                 <button class="btn btn-primary btn-sm" type="button" onclick="addNewKeyword()">Add</button>
             </div>
