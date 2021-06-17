@@ -46,7 +46,7 @@ def review_post(cabin_id):
 
     flash("Review added.", "success")
 
-    return redirect(f"/cabins/{id}")
+    return redirect(f"/cabins/{cabin_id}")
 
 
 @review_routes.route(
