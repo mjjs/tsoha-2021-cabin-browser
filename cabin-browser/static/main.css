@@ -119,4 +119,9 @@ ul {
 
 .cabin-description {
     white-space: pre-line;
+    overflow-wrap: break-word;
+}
+
+#cabin-top-info {
+    overflow-wrap: break-word;
 }
