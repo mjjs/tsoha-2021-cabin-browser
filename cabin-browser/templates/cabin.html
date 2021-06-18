@@ -5,7 +5,10 @@
     const deleteReview = (cabinId, reviewId) => {
         fetch(
             `/cabins/${cabinId}/review/${reviewId}`,
-            { method: "DELETE" },
+            {
+                method: "DELETE",
+                headers: { "X-CSRFToken": "{{ csrf_token() }}" },
+            },
         ).then(() => {
             window.location = `/cabins/${cabinId}`;
         });

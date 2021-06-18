@@ -95,6 +95,8 @@
         </label>
     </div>
 
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
     <input class="btn btn-primary" type="submit" value="Add cabin">
 </form>
 
@@ -129,7 +131,10 @@
 
             fetch("/keywords", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token() }}",
+                },
                 body: JSON.stringify({ keyword: keyword }),
             }).then((res) => {
                 return res.text();

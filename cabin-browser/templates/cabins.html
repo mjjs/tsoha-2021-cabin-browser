@@ -15,7 +15,12 @@
 
         fetch(
             `/cabins/${cabinId}`,
-            { method: "DELETE" },
+            {
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token() }}",
+                },
+            },
         ).then(() => {
             window.location = `/cabins${window.location.search}`;
         });

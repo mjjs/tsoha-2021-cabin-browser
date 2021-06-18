@@ -24,6 +24,8 @@
             <textarea class="form-control" name="content" placeholder="Write your message here" maxlength="1500"></textarea>
         </div>
 
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
         <input class="btn btn-primary" type="submit" value="Send review">
     </form>
 </div>

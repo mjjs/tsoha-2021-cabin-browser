@@ -1,5 +1,6 @@
 from flask import Flask, redirect, render_template
 from flask_login import LoginManager
+from flask_seasurf import SeaSurf
 from werkzeug.exceptions import RequestEntityTooLarge
 from config import (
     FLASK_SECRET_KEY,
@@ -29,6 +30,9 @@ app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 login_manager = LoginManager()
 login_manager.login_view = "user_routes.login_get"
 login_manager.init_app(app)
+
+csrf = SeaSurf()
+csrf.init_app(app)
 
 
 @app.errorhandler(413)
