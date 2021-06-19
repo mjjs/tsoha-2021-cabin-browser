@@ -125,3 +125,7 @@ ul {
 #cabin-top-info {
     overflow-wrap: break-word;
 }
+
+.cancel-reservation-btn {
+    margin-left: 5px;
+}

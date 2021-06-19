@@ -13,6 +13,18 @@
             window.location = `/cabins/${cabinId}`;
         });
     };
+
+    const cancelReservation = (cabinId, reservationId) => {
+        fetch(
+            `/reservations/${reservationId}`,
+            {
+                method: "DELETE",
+                headers: { "X-CSRFToken": "{{ csrf_token() }}" },
+            },
+        ).then(() => {
+            window.location = `/cabins/${cabinId}`;
+        });
+    };
 </script>
 
 <h2 id="cabin-top-info">
@@ -89,7 +101,12 @@
         <ul>
             {% for reservation in reservations %}
                 <li>
-                    <p>{{ reservation.start }} - {{ reservation.end }}</p>
+                    <p>
+                    {{ reservation.start }} - {{ reservation.end }}
+                    <button class="btn btn-danger btn-sm cancel-reservation-btn" onclick="cancelReservation({{ cabin.id}}, {{ reservation.id }})">
+                        Cancel reservation
+                    </button>
+                    </p>
                 </li>
             {% endfor %}
         </ul>

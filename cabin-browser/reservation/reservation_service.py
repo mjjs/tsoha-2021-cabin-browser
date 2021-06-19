@@ -52,3 +52,17 @@ class ReservationService:
         )
 
         commit_transaction()
+
+    def delete_reservation(
+        self,
+        reservation_id,
+        current_user_id,
+    ):
+        reservation_to_delete = self._reservation_repository.get(reservation_id)
+
+        if reservation_to_delete.user_id != current_user_id:
+            return False
+
+        self._reservation_repository.delete(reservation_id)
+        commit_transaction()
+        return True

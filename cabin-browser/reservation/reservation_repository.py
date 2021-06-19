@@ -1,6 +1,10 @@
 from repository import Repository
 
 
+class ReservationNotFoundError(Exception):
+    pass
+
+
 class Reservation:
     def __init__(self, id, start, end, user_id, cabin_id):
         self.id = id
@@ -24,6 +28,20 @@ class ReservationRepository(Repository):
     def add(self, start, end, user_id, cabin_id):
         Repository._add(self=self, values=[start, end, user_id, cabin_id])
 
+    def get(self, id):
+        reservation = Repository._get(self, id)
+        if not reservation:
+            raise ReservationNotFoundError()
+
+        (id, start, end, user_id, cabin_id) = reservation
+        return Reservation(
+            id=id,
+            start=start,
+            end=end,
+            user_id=user_id,
+            cabin_id=cabin_id,
+        )
+
     def get_by_cabin_id(self, cabin_id):
         with self._connection_pool.cursor() as cursor:
             sql = """
@@ -40,3 +58,6 @@ class ReservationRepository(Repository):
                 reservations.append(Reservation(id, start, end, user_id, cabin_id))
 
             return reservations
+
+    def delete(self, id):
+        Repository._delete(self, id)

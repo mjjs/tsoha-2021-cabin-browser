@@ -9,6 +9,7 @@ from .reservation_service import (
     ReservationConflictError,
     ReservationInPastError,
 )
+from .reservation_repository import ReservationNotFoundError
 
 reservation_routes = Blueprint(
     "reservation_routes", __name__, template_folder="templates"
@@ -80,3 +81,22 @@ def reservation_post(cabin_id):
         return redirect(f"/reservations/{cabin_id}")
 
     return redirect(f"/cabins/{cabin_id}")
+
+
+@reservation_routes.route("/reservations/<int:reservation_id>", methods=["DELETE"])
+@login_required
+def reservation_delete(reservation_id):
+    if current_user.role == UserRole.CUSTOMER:
+        flash("Please log in as a customer to cancel reservations.", "error")
+        return "NOT OK", 403
+
+    try:
+        if reservation_service.delete_reservation(reservation_id, current_user.id):
+            flash("Reservation cancelled successfully.", "success")
+            return "OK"
+
+        flash("You are not authorized to cancel this reservation.", "error")
+        return "NOT OK", 403
+    except ReservationNotFoundError:
+        flash("You tried to cancel a non-existent reservation.", "error")
+        return "NOT OK", 404
