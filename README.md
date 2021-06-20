@@ -3,7 +3,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 The application is a summer cabin browser for Finland. A cabin owner can list their
-summer cabin into the site and regular users can browse, rate, and book these cabins
+summer cabin on the site and customers can browse, rate, and book these cabins
 for the summer.
 
 A live demo is up at [https://cabin-browser.herokuapp.com/](https://cabin-browser.herokuapp.com).
@@ -13,16 +13,9 @@ no visitors lately.
 ## Plan
 The original plan can be found over at [plan.md](./docs/plan.md).
 
-## State of the project
-I have refactored the code a bit. The repository classes inherit from a base Repository class, which
-holds common functionality for them. The business logic has also been moved away from the routes
-and into separate service classes. These service classes handle database transactions so that
-the repositories do not need to be aware of when to commit or rollback the transactions.
-
-Apart from that, I have also added support for running the application in production using Gunicorn.
-
 ## Testing in Heroku
-The application can be found [here](https://cabin-browser.herokuapp.com). There are a few pre-made users that can be used when testing the application:
+The application can be found [here](https://cabin-browser.herokuapp.com).
+There are a few pre-made users that can be used when testing the application:
 
 Customer:
 * kalle.kayttaja@email.com : salasana
@@ -31,7 +24,19 @@ Cabin owners:
 * olli.omistaja@email.com : salasana
 * otso.omistaja@email.com : salasana
 
-You can also register a new user if you want. You can browse the cabins and add reviews/reservations to cabins as a customer. If you log in as a cabin owner, you can add new cabins also.
+You can also register a new user if you want.
 
-## TODO
-* Admin functionality to delete users.
+If you log in as a customer, you may:
+* View the cabins that have been added by cabin owners.
+    * Filter the cabins by keywords.
+    * Filter the cabins by municipality.
+* Book a cabin.
+* Cancel a booking you have made.
+* Review a cabin.
+* Remove your added reviews.
+
+If you log in as a cabin owner, you may:
+* Add a new cabin to the site.
+    * Add custom keywords for the cabins during cabin adding process.
+* Remove your cabins from the site.
+* Delete any spam reviews from your cabins.
