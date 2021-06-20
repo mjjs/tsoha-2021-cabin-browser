@@ -14,7 +14,7 @@ class KeywordService:
             raise EmptyKeywordError()
 
         try:
-            keyword_id = str(self._keyword_repository.add(keyword))
+            keyword_id = str(self._keyword_repository.add(keyword.lower()))
             commit_transaction()
             return keyword_id
         except:

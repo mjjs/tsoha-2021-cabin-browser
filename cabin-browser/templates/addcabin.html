@@ -127,7 +127,7 @@
         };
 
         const addNewKeyword = () => {
-            const keyword = document.getElementById("new-keyword").value;
+            const keyword = document.getElementById("new-keyword").value.toLowerCase();
 
             fetch("/keywords", {
                 method: "POST",
