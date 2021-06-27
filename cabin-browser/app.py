@@ -11,6 +11,7 @@ from config import (
 )
 from user import UserRepository, user_routes
 from db import connection_pool
+from waitress import serve
 
 from cabin import cabin_routes
 from keywords import keyword_routes
@@ -52,11 +53,7 @@ def index_get():
 
 
 def main():
-    app.run(
-        debug=ENVIRONMENT == "DEV",
-        host="0.0.0.0",
-        port=PORT,
-    )
+    serve(app, host="0.0.0.0", port=PORT)
 
 
 if __name__ == "__main__":
